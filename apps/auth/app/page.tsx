@@ -7,5 +7,6 @@ import { redirect } from 'next/navigation';
  * /signin or /signup directly, or be redirected from docs.
  */
 export default function HomePage() {
-  redirect('http://localhost:3000');
+  const docsUrl = process.env.NEXT_PUBLIC_DOCS_URL || 'http://localhost:3000';
+  redirect(docsUrl);
 }
