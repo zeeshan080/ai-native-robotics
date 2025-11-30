@@ -5,8 +5,9 @@ services:
   - type: web
     name: ai-native-robotics-api
     runtime: docker
-    dockerfilePath: packages/chatkit-backend/Dockerfile
-    dockerContext: packages/chatkit-backend
+    rootDir: packages/chatkit-backend
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
     branch: development
     plan: free
     healthCheckPath: /health
