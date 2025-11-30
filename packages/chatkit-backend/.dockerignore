@@ -31,10 +31,8 @@ build/
 .git/
 .gitignore
 
-# Documentation
-README.md
+# Documentation (keep README.md for hatchling)
 IMPLEMENTATION.md
-*.md
 
 # Lock files (we use pyproject.toml)
 uv.lock
