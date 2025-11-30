@@ -1,5 +1,3 @@
 {
-  "buildCommand": "pnpm turbo build --filter=auth",
-  "installCommand": "pnpm install",
   "framework": "nextjs"
 }

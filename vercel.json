@@ -1,7 +1,0 @@
-{
-  "$schema": "https://openapi.vercel.sh/vercel.json",
-  "buildCommand": "pnpm turbo build --filter=auth",
-  "outputDirectory": "apps/auth/.next",
-  "installCommand": "pnpm install",
-  "framework": "nextjs"
-}
