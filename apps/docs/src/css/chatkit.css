@@ -1,0 +1,591 @@
+/**
+ * ChatKit Styles
+ *
+ * Floating chat interface with modern, clean design
+ * IMPORTANT: Uses explicit colors (no CSS variables) for portal/floating components
+ */
+
+/* ========================================
+   Floating Chat Bar (Bottom-Center)
+   ======================================== */
+
+.chatkit-bar {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9999;
+  max-width: 700px;
+  width: calc(100% - 40px);
+  background: #ffffff;
+  border-radius: 24px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.12);
+  padding: 12px 16px;
+  transition: all 0.3s ease;
+}
+
+@media (prefers-color-scheme: dark) {
+  .chatkit-bar {
+    background: #1b1b1d;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+  }
+}
+
+[data-theme='dark'] .chatkit-bar {
+  background: #1b1b1d;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+}
+
+.chatkit-bar__container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.chatkit-input {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 15px;
+  color: #1f2937;
+  padding: 8px 12px;
+  font-family: inherit;
+}
+
+@media (prefers-color-scheme: dark) {
+  .chatkit-input {
+    color: #e5e7eb;
+  }
+}
+
+[data-theme='dark'] .chatkit-input {
+  color: #e5e7eb;
+}
+
+.chatkit-input::placeholder {
+  color: #9ca3af;
+}
+
+.chatkit-input:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.chatkit-send-btn {
+  background: #2e8555;
+  border: none;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #ffffff;
+  font-size: 18px;
+  font-weight: bold;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.chatkit-send-btn:hover:not(:disabled) {
+  background: #25704b;
+  transform: scale(1.05);
+}
+
+.chatkit-send-btn:disabled {
+  background: #d1d5db;
+  cursor: not-allowed;
+}
+
+@media (prefers-color-scheme: dark) {
+  .chatkit-send-btn:disabled {
+    background: #4b5563;
+  }
+}
+
+[data-theme='dark'] .chatkit-send-btn:disabled {
+  background: #4b5563;
+}
+
+.chatkit-expand-btn {
+  background: #f3f4f6;
+  border: none;
+  border-radius: 18px;
+  padding: 6px 12px;
+  font-size: 13px;
+  color: #6b7280;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.chatkit-expand-btn:hover {
+  background: #e5e7eb;
+  color: #374151;
+}
+
+@media (prefers-color-scheme: dark) {
+  .chatkit-expand-btn {
+    background: #374151;
+    color: #9ca3af;
+  }
+
+  .chatkit-expand-btn:hover {
+    background: #4b5563;
+    color: #d1d5db;
+  }
+}
+
+[data-theme='dark'] .chatkit-expand-btn {
+  background: #374151;
+  color: #9ca3af;
+}
+
+[data-theme='dark'] .chatkit-expand-btn:hover {
+  background: #4b5563;
+  color: #d1d5db;
+}
+
+.chatkit-bar__counter {
+  text-align: center;
+  font-size: 11px;
+  color: #9ca3af;
+  margin-top: 4px;
+}
+
+.chatkit-bar__counter--warning {
+  color: #f59e0b;
+  font-weight: 500;
+}
+
+/* ========================================
+   Chat Panel (Expanded View)
+   ======================================== */
+
+.chatkit-panel {
+  position: fixed;
+  bottom: 90px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9998;
+  max-width: 700px;
+  width: calc(100% - 40px);
+  height: 500px;
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.16);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: slideUp 0.3s ease;
+}
+
+@media (prefers-color-scheme: dark) {
+  .chatkit-panel {
+    background: #1b1b1d;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+  }
+}
+
+[data-theme='dark'] .chatkit-panel {
+  background: #1b1b1d;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+.chatkit-panel__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+@media (prefers-color-scheme: dark) {
+  .chatkit-panel__header {
+    border-bottom-color: #374151;
+  }
+}
+
+[data-theme='dark'] .chatkit-panel__header {
+  border-bottom-color: #374151;
+}
+
+.chatkit-panel__title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #111827;
+}
+
+@media (prefers-color-scheme: dark) {
+  .chatkit-panel__title {
+    color: #f9fafb;
+  }
+}
+
+[data-theme='dark'] .chatkit-panel__title {
+  color: #f9fafb;
+}
+
+.chatkit-panel__actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.chatkit-panel__btn {
+  background: transparent;
+  border: none;
+  font-size: 24px;
+  line-height: 1;
+  color: #6b7280;
+  cursor: pointer;
+  padding: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.chatkit-panel__btn:hover {
+  background: #f3f4f6;
+  color: #111827;
+}
+
+.chatkit-panel__btn--new {
+  font-size: 28px;
+  font-weight: 300;
+}
+
+.chatkit-panel__btn--new:hover {
+  color: #2e8555;
+}
+
+.chatkit-panel__btn--close {
+  font-size: 28px;
+}
+
+@media (prefers-color-scheme: dark) {
+  .chatkit-panel__btn:hover {
+    background: #374151;
+    color: #f9fafb;
+  }
+
+  .chatkit-panel__btn--new:hover {
+    color: #4ade80;
+  }
+}
+
+[data-theme='dark'] .chatkit-panel__btn:hover {
+  background: #374151;
+  color: #f9fafb;
+}
+
+[data-theme='dark'] .chatkit-panel__btn--new:hover {
+  color: #4ade80;
+}
+
+.chatkit-panel__messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.chatkit-panel__empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: #6b7280;
+  text-align: center;
+}
+
+.chatkit-panel__empty p {
+  margin: 8px 0;
+}
+
+@media (prefers-color-scheme: dark) {
+  .chatkit-panel__empty {
+    color: #9ca3af;
+  }
+}
+
+[data-theme='dark'] .chatkit-panel__empty {
+  color: #9ca3af;
+}
+
+.chatkit-panel__error {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #991b1b;
+  padding: 12px 16px;
+  margin: 0 16px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+@media (prefers-color-scheme: dark) {
+  .chatkit-panel__error {
+    background: #7f1d1d;
+    border-color: #991b1b;
+    color: #fecaca;
+  }
+}
+
+[data-theme='dark'] .chatkit-panel__error {
+  background: #7f1d1d;
+  border-color: #991b1b;
+  color: #fecaca;
+}
+
+/* ========================================
+   Chat Messages
+   ======================================== */
+
+.chatkit-message {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-width: 85%;
+}
+
+.chatkit-message--user {
+  align-self: flex-end;
+}
+
+.chatkit-message--assistant {
+  align-self: flex-start;
+}
+
+.chatkit-message__header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: #6b7280;
+}
+
+@media (prefers-color-scheme: dark) {
+  .chatkit-message__header {
+    color: #9ca3af;
+  }
+}
+
+[data-theme='dark'] .chatkit-message__header {
+  color: #9ca3af;
+}
+
+.chatkit-message__role {
+  font-weight: 600;
+}
+
+.chatkit-message__timestamp {
+  opacity: 0.7;
+}
+
+.chatkit-message__content {
+  background: #f3f4f6;
+  color: #111827;
+  padding: 12px 16px;
+  border-radius: 16px;
+  font-size: 14px;
+  line-height: 1.5;
+  word-wrap: break-word;
+}
+
+@media (prefers-color-scheme: dark) {
+  .chatkit-message__content {
+    background: #374151;
+    color: #f9fafb;
+  }
+}
+
+[data-theme='dark'] .chatkit-message__content {
+  background: #374151;
+  color: #f9fafb;
+}
+
+.chatkit-message--user .chatkit-message__content {
+  background: #2e8555;
+  color: #ffffff;
+}
+
+.chatkit-message__content--error {
+  background: #fef2f2;
+  color: #991b1b;
+  border: 1px solid #fecaca;
+}
+
+@media (prefers-color-scheme: dark) {
+  .chatkit-message__content--error {
+    background: #7f1d1d;
+    color: #fecaca;
+    border-color: #991b1b;
+  }
+}
+
+[data-theme='dark'] .chatkit-message__content--error {
+  background: #7f1d1d;
+  color: #fecaca;
+  border-color: #991b1b;
+}
+
+.chatkit-message__streaming-indicator {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 2px;
+}
+
+.chatkit-message__cursor {
+  animation: blink 1s infinite;
+}
+
+@keyframes blink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0; }
+}
+
+.chatkit-message__error-badge {
+  background: #dc2626;
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 10px;
+  align-self: flex-start;
+  text-transform: uppercase;
+}
+
+/* ========================================
+   Loading Spinner
+   ======================================== */
+
+.chatkit-spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #ffffff;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+  display: inline-block;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ========================================
+   Responsive Adjustments
+   ======================================== */
+
+@media (max-width: 768px) {
+  .chatkit-panel {
+    height: 400px;
+    width: calc(100% - 20px);
+  }
+
+  .chatkit-bar {
+    width: calc(100% - 20px);
+  }
+
+  .chatkit-message {
+    max-width: 90%;
+  }
+}
+
+/* ========================================
+   Text Selection Tooltip
+   ======================================== */
+
+.chatkit-selection-tooltip {
+  background: #1f2937;
+  border-radius: 10px;
+  padding: 6px 8px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+  display: flex;
+  gap: 4px;
+  animation: tooltipFadeIn 0.2s ease;
+}
+
+@keyframes tooltipFadeIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -100%) translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -100%) translateY(0);
+  }
+}
+
+.chatkit-selection-tooltip__btn {
+  background: transparent;
+  border: none;
+  color: #ffffff;
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.chatkit-selection-tooltip__btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.chatkit-selection-tooltip__btn--explain {
+  color: #60a5fa;
+}
+
+.chatkit-selection-tooltip__btn--explain:hover {
+  background: rgba(96, 165, 250, 0.2);
+}
+
+.chatkit-selection-tooltip__btn--translate {
+  color: #a78bfa;
+}
+
+.chatkit-selection-tooltip__btn--translate:hover {
+  background: rgba(167, 139, 250, 0.2);
+}
+
+.chatkit-selection-tooltip__btn--summarize {
+  color: #34d399;
+}
+
+.chatkit-selection-tooltip__btn--summarize:hover {
+  background: rgba(52, 211, 153, 0.2);
+}
+
+/* Tooltip arrow */
+.chatkit-selection-tooltip::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 6px solid transparent;
+  border-top-color: #1f2937;
+}
