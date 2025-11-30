@@ -52,7 +52,11 @@ const defaultContextValue: UserContextValue = {
 const UserContext = createContext<UserContextValue>(defaultContextValue);
 
 const STORAGE_KEY = 'user_id';
-const API_BASE = 'http://localhost:8000/api';
+
+// Use environment variable in production, fallback to localhost for development
+const API_BASE = typeof window !== 'undefined' && window.location.hostname !== 'localhost'
+  ? 'https://ai-native-robotics-api.onrender.com/api'
+  : 'http://localhost:8000/api';
 
 /**
  * Generate a UUID v4
@@ -205,7 +209,9 @@ export function UserProvider({ children }: UserProviderProps): React.ReactElemen
 
         // Redirect to home after onboarding
         if (typeof window !== 'undefined') {
-          window.location.href = '/';
+          // Use base path for GitHub Pages deployment
+          const basePath = window.location.hostname.includes('github.io') ? '/ai-native-robotics/' : '/';
+          window.location.href = basePath;
         }
       } else {
         const errorData = await response.json();
@@ -297,7 +303,9 @@ export function UserProvider({ children }: UserProviderProps): React.ReactElemen
       !window.location.pathname.includes('/onboarding') &&
       !state.error
     ) {
-      window.location.href = '/onboarding';
+      // Use base path for GitHub Pages deployment
+      const basePath = window.location.hostname.includes('github.io') ? '/ai-native-robotics' : '';
+      window.location.href = `${basePath}/onboarding`;
     }
   }, [isMounted, state.isLoading, state.userId, state.onboardingCompleted, state.error]);
 

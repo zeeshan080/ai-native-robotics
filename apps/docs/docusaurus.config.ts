@@ -7,11 +7,14 @@ const config: Config = {
   tagline: 'A comprehensive textbook for learning robotics with AI-native approaches',
   favicon: 'img/favicon.ico',
 
-  url: 'https://ai-native-robotics.github.io',
-  baseUrl: '/',
+  // GitHub Pages deployment configuration
+  url: 'https://zeeshan080.github.io',
+  baseUrl: '/ai-native-robotics/',
 
-  organizationName: 'ai-native-robotics',
+  organizationName: 'zeeshan080',
   projectName: 'ai-native-robotics',
+  deploymentBranch: 'gh-pages',
+  trailingSlash: false,
 
   onBrokenLinks: 'throw',
 
@@ -33,7 +36,7 @@ const config: Config = {
         docs: {
           routeBasePath: '/',
           sidebarPath: './sidebars.ts',
-          editUrl: 'https://github.com/ai-native-robotics/ai-native-robotics/tree/main/apps/docs/',
+          editUrl: 'https://github.com/zeeshan080/ai-native-robotics/tree/development/apps/docs/',
         },
         blog: false,
         theme: {
@@ -64,7 +67,7 @@ const config: Config = {
           position: 'right',
         },
         {
-          href: 'https://github.com/ai-native-robotics/ai-native-robotics',
+          href: 'https://github.com/zeeshan080/ai-native-robotics',
           label: 'GitHub',
           position: 'right',
         },
@@ -91,7 +94,7 @@ const config: Config = {
           items: [
             {
               label: 'GitHub',
-              href: 'https://github.com/ai-native-robotics/ai-native-robotics',
+              href: 'https://github.com/zeeshan080/ai-native-robotics',
             },
           ],
         },
