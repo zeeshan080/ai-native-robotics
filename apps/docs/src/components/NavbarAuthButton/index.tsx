@@ -1,9 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import { createAuthClient } from 'better-auth/react';
 
+// Determine auth service URL based on environment
+const getAuthUrl = () => {
+  if (typeof window === 'undefined') return 'http://localhost:3001';
+  // Production: GitHub Pages points to Vercel auth service
+  if (window.location.hostname.includes('github.io')) {
+    return 'https://ai-native-robotics-auth.vercel.app';
+  }
+  // Local development
+  return 'http://localhost:3001';
+};
+
+const AUTH_URL = getAuthUrl();
+
 // Create auth client directly to avoid server-side dependencies from @repo/auth-config
 const authClient = createAuthClient({
-  baseURL: 'http://localhost:3001',
+  baseURL: AUTH_URL,
   fetchOptions: {
     credentials: 'include',
   },
@@ -53,7 +66,7 @@ export function NavbarAuthButton(): React.ReactElement {
 
   const handleLogin = () => {
     const callbackUrl = encodeURIComponent(window.location.href);
-    window.location.href = `http://localhost:3001/signin?callbackUrl=${callbackUrl}`;
+    window.location.href = `${AUTH_URL}/signin?callbackUrl=${callbackUrl}`;
   };
 
   const handleLogout = async () => {

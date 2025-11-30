@@ -6,9 +6,18 @@ import { PersonalizedContent } from './PersonalizedContent';
 import { LoginPrompt } from '../LoginPrompt';
 import styles from './PersonalizedLesson.module.css';
 
+// Determine auth service URL based on environment
+const getAuthUrl = () => {
+  if (typeof window === 'undefined') return 'http://localhost:3001';
+  if (window.location.hostname.includes('github.io')) {
+    return 'https://ai-native-robotics-auth.vercel.app';
+  }
+  return 'http://localhost:3001';
+};
+
 // Create auth client directly to avoid server-side dependencies from @repo/auth-config
 const authClient = createAuthClient({
-  baseURL: 'http://localhost:3001',
+  baseURL: getAuthUrl(),
   fetchOptions: {
     credentials: 'include',
   },

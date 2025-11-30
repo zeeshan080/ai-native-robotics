@@ -1,5 +1,14 @@
 import React from 'react';
 
+// Determine auth service URL based on environment
+const getAuthUrl = () => {
+  if (typeof window === 'undefined') return 'http://localhost:3001';
+  if (window.location.hostname.includes('github.io')) {
+    return 'https://ai-native-robotics-auth.vercel.app';
+  }
+  return 'http://localhost:3001';
+};
+
 interface LoginPromptProps {
   message?: string;
   buttonText?: string;
@@ -14,10 +23,12 @@ export function LoginPrompt({
   message = 'Sign in to unlock personalized content tailored to your learning level and goals.',
   buttonText = 'Login to Personalize',
 }: LoginPromptProps): React.ReactElement {
+  const authUrl = getAuthUrl();
+
   const handleLogin = () => {
     // Get current page URL for callback after login
     const callbackUrl = encodeURIComponent(window.location.href);
-    window.location.href = `http://localhost:3001/signin?callbackUrl=${callbackUrl}`;
+    window.location.href = `${authUrl}/signin?callbackUrl=${callbackUrl}`;
   };
 
   return (
@@ -123,7 +134,7 @@ export function LoginPrompt({
       >
         Don't have an account?{' '}
         <a
-          href={`http://localhost:3001/signup?callbackUrl=${encodeURIComponent(typeof window !== 'undefined' ? window.location.href : '')}`}
+          href={`${authUrl}/signup?callbackUrl=${encodeURIComponent(typeof window !== 'undefined' ? window.location.href : '')}`}
           style={{
             color: 'var(--ifm-color-primary)',
             textDecoration: 'none',
