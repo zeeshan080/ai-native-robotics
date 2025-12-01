@@ -31,7 +31,19 @@ const getTrustedOrigins = () => {
     origins.push(process.env.PRODUCTION_URL);
   }
 
-  return origins;
+  // GitHub Pages docs site
+  if (process.env.NEXT_PUBLIC_DOCS_URL) {
+    origins.push(process.env.NEXT_PUBLIC_DOCS_URL);
+  }
+
+  // Additional CORS origins from environment
+  if (process.env.CORS_ALLOWED_ORIGINS) {
+    const additionalOrigins = process.env.CORS_ALLOWED_ORIGINS.split(',').map(o => o.trim());
+    origins.push(...additionalOrigins);
+  }
+
+  // Remove duplicates
+  return [...new Set(origins)];
 };
 
 /**

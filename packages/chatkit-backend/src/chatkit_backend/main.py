@@ -48,16 +48,35 @@ app = FastAPI(
 
 
 # Configure CORS
-# In production, replace with actual frontend domain
-# Auth service needs to be included for session cookie forwarding
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=[
+# Reads from CORS_ORIGINS env var, falls back to localhost for development
+def get_cors_origins():
+    default_origins = [
         "http://localhost:3000",
         "http://127.0.0.1:3000",
-        "http://localhost:3001",  # Auth service
-        "http://127.0.0.1:3001",  # Auth service
-    ],
+        "http://localhost:3001",
+        "http://127.0.0.1:3001",
+    ]
+
+    # Add origins from environment variable
+    env_origins = os.getenv("CORS_ORIGINS", "")
+    if env_origins:
+        additional = [o.strip() for o in env_origins.split(",") if o.strip()]
+        default_origins.extend(additional)
+
+    # Remove duplicates while preserving order
+    seen = set()
+    unique_origins = []
+    for origin in default_origins:
+        if origin not in seen:
+            seen.add(origin)
+            unique_origins.append(origin)
+
+    logger.info(f"CORS origins configured: {unique_origins}")
+    return unique_origins
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=get_cors_origins(),
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
