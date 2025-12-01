@@ -18,6 +18,8 @@ services:
         value: gemini
       - key: GEMINI_API_KEY
         sync: false  # Set manually in Render dashboard
+      - key: GEMINI_DEFAULT_MODEL
+        value: gemini-2.5-flash
       - key: AUTH_SERVICE_URL
         value: https://ai-native-robotics.vercel.app
       - key: CORS_ORIGINS

@@ -10,7 +10,7 @@ Environment variables:
 - OPENAI_API_KEY: OpenAI API key
 - GEMINI_API_KEY: Gemini API key
 - OPENAI_DEFAULT_MODEL: Model name for OpenAI (default: "gpt-4o-mini")
-- GEMINI_DEFAULT_MODEL: Model name for Gemini (default: "gemini-2.0-flash-exp")
+- GEMINI_DEFAULT_MODEL: Model name for Gemini (default: "gemini-2.5-flash")
 """
 
 import os
@@ -42,7 +42,7 @@ def create_model() -> OpenAIChatCompletionsModel:
             base_url="https://generativelanguage.googleapis.com/v1beta/openai/"
         )
 
-        model_name = os.getenv("GEMINI_DEFAULT_MODEL", "gemini-2.0-flash-exp")
+        model_name = os.getenv("GEMINI_DEFAULT_MODEL", "gemini-2.5-flash")
 
         return OpenAIChatCompletionsModel(
             model=model_name,
