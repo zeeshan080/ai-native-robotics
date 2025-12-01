@@ -6,7 +6,7 @@ const getAuthUrl = () => {
   if (typeof window === 'undefined') return 'http://localhost:3001';
   // Production: GitHub Pages points to Vercel auth service
   if (window.location.hostname.includes('github.io')) {
-    return 'https://ai-native-robotics-auth.vercel.app';
+    return 'https://ai-native-robotics.vercel.app';
   }
   // Local development
   return 'http://localhost:3001';

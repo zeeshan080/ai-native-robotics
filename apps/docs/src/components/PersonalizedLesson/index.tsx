@@ -10,7 +10,7 @@ import styles from './PersonalizedLesson.module.css';
 const getAuthUrl = () => {
   if (typeof window === 'undefined') return 'http://localhost:3001';
   if (window.location.hostname.includes('github.io')) {
-    return 'https://ai-native-robotics-auth.vercel.app';
+    return 'https://ai-native-robotics.vercel.app';
   }
   return 'http://localhost:3001';
 };
