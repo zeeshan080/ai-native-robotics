@@ -55,6 +55,8 @@ def get_cors_origins():
         "http://127.0.0.1:3000",
         "http://localhost:3001",
         "http://127.0.0.1:3001",
+        "https://zeeshan080.github.io",  # GitHub Pages (hardcoded fallback)
+        "https://ai-native-robotics-auth.vercel.app",  # Vercel auth (hardcoded fallback)
     ]
 
     # Add origins from environment variable

@@ -4,15 +4,42 @@ import { NextRequest, NextResponse } from "next/server";
 
 const handler = toNextJsHandler(auth);
 
-// Allowed origins for CORS - read from environment variable
-// Format: comma-separated list of origins
-// Example: CORS_ALLOWED_ORIGINS=http://localhost:3000,http://localhost:3001,http://localhost:8000
-const allowedOrigins = (process.env.CORS_ALLOWED_ORIGINS || 'http://localhost:3000,http://localhost:3001,http://localhost:8000')
-  .split(',')
-  .map(origin => origin.trim())
-  .filter(Boolean);
+// Get allowed origins at runtime (not build time)
+function getAllowedOrigins(): string[] {
+  const envOrigins = process.env.CORS_ALLOWED_ORIGINS || '';
+  const docsUrl = process.env.NEXT_PUBLIC_DOCS_URL || '';
+
+  const origins = [
+    'http://localhost:3000',
+    'http://localhost:3001',
+    'http://localhost:8000',
+    'https://zeeshan080.github.io', // GitHub Pages (hardcoded as fallback)
+  ];
+
+  // Add from CORS_ALLOWED_ORIGINS env var
+  if (envOrigins) {
+    const additional = envOrigins.split(',').map(o => o.trim()).filter(Boolean);
+    origins.push(...additional);
+  }
+
+  // Add docs URL if set
+  if (docsUrl) {
+    // Extract origin from full URL (remove path)
+    try {
+      const url = new URL(docsUrl);
+      origins.push(url.origin);
+    } catch {
+      origins.push(docsUrl);
+    }
+  }
+
+  // Remove duplicates
+  return [...new Set(origins)];
+}
 
 function getCorsHeaders(origin: string | null) {
+  const allowedOrigins = getAllowedOrigins();
+
   const headers: Record<string, string> = {
     'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
     'Access-Control-Allow-Headers': 'Content-Type, Authorization',
