@@ -16,9 +16,23 @@ const AUTH_BASE_URL = typeof window !== 'undefined' && window.location.hostname 
   ? 'https://ai-native-robotics.vercel.app'
   : 'http://localhost:3001';
 
+const SESSION_TOKEN_KEY = 'better_auth_session_token';
+
+// Get token from localStorage for cross-domain auth
+const getStoredToken = (): string | null => {
+  if (typeof window === 'undefined') return null;
+  return localStorage.getItem(SESSION_TOKEN_KEY);
+};
+
 const authClient = createAuthClient({
   baseURL: AUTH_BASE_URL,
-  fetchOptions: { credentials: 'include' },
+  fetchOptions: {
+    credentials: 'include',
+    auth: {
+      type: 'Bearer',
+      token: () => getStoredToken() || '',
+    },
+  },
 });
 
 // Session hook for BetterAuth
@@ -31,6 +45,13 @@ function useAuthSession() {
   useEffect(() => {
     async function fetchSession() {
       try {
+        // Only try to fetch session if we have a token
+        const token = getStoredToken();
+        if (!token) {
+          setIsLoading(false);
+          return;
+        }
+
         const session = await authClient.getSession();
         if (session.data?.user) {
           setUser({

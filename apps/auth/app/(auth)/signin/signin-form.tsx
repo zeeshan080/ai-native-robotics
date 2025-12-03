@@ -68,10 +68,35 @@ export function SignInForm() {
         return;
       }
 
-      // Success - redirect to callback URL or default (docs site)
+      // Success - get session token and redirect
       if (result.data) {
-        const callbackUrl = validateCallbackUrl(searchParams.get('callbackUrl'));
-        window.location.href = callbackUrl;
+        try {
+          // Fetch the session token from our custom endpoint
+          const tokenResponse = await fetch('/api/session-token', {
+            credentials: 'include', // Include cookies
+          });
+
+          if (!tokenResponse.ok) {
+            setFormError('Failed to retrieve session token');
+            return;
+          }
+
+          const tokenData = await tokenResponse.json();
+          const sessionToken = tokenData.token;
+
+          if (!sessionToken) {
+            setFormError('Session token not found');
+            return;
+          }
+
+          // Redirect with token in URL (will be extracted and stored in localStorage)
+          const callbackUrl = validateCallbackUrl(searchParams.get('callbackUrl'));
+          const separator = callbackUrl.includes('?') ? '&' : '?';
+          window.location.href = `${callbackUrl}${separator}session_token=${sessionToken}`;
+        } catch (error) {
+          console.error('Failed to get session token:', error);
+          setFormError('Failed to retrieve session token');
+        }
       }
     } catch (error) {
       console.error('Signin error:', error);

@@ -1,5 +1,6 @@
 import { betterAuth } from 'better-auth';
 import { drizzleAdapter } from 'better-auth/adapters/drizzle';
+import { bearer } from 'better-auth/plugins';
 
 /**
  * Lazy load database to avoid circular dependencies and initialization issues
@@ -103,6 +104,11 @@ export const auth = betterAuth({
     cookiePrefix: 'better-auth',
     useSecureCookies: process.env.NODE_ENV === 'production',
   },
+
+  // Plugins for cross-domain auth support
+  plugins: [
+    bearer(), // Enables bearer token auth for cross-domain scenarios
+  ],
 });
 
 export type Auth = typeof auth;
