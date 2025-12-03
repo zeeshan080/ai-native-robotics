@@ -8,12 +8,13 @@ Provides:
 
 import os
 import logging
+import ipaddress
 from dotenv import load_dotenv
 
 # Load environment variables from .env file
 load_dotenv()
 from datetime import datetime, timezone
-from typing import AsyncIterator
+from typing import AsyncIterator, Optional
 
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
@@ -133,25 +134,48 @@ async def event_generator(request: ChatRequest) -> AsyncIterator[dict]:
         }
 
 
+def validate_ip(ip: str) -> Optional[str]:
+    """Validate and normalize an IP address.
+
+    Returns the validated IP string, or None if invalid.
+    """
+    try:
+        # This validates both IPv4 and IPv6
+        validated = ipaddress.ip_address(ip.strip())
+        return str(validated)
+    except ValueError:
+        return None
+
+
 def get_client_ip(request: Request) -> str:
-    """Extract client IP address from request headers or connection.
+    """Extract and validate client IP address from request headers or connection.
 
     Handles proxied requests by checking X-Forwarded-For header first.
+    Validates IP format to prevent injection attacks.
     """
     # Check for forwarded IP (when behind proxy/load balancer)
     forwarded_for = request.headers.get("X-Forwarded-For")
     if forwarded_for:
         # X-Forwarded-For can contain multiple IPs; first one is the client
-        return forwarded_for.split(",")[0].strip()
+        raw_ip = forwarded_for.split(",")[0].strip()
+        validated = validate_ip(raw_ip)
+        if validated:
+            return validated
+        logger.warning(f"Invalid IP in X-Forwarded-For header: {raw_ip}")
 
     # Check X-Real-IP header (common alternative)
     real_ip = request.headers.get("X-Real-IP")
     if real_ip:
-        return real_ip.strip()
+        validated = validate_ip(real_ip)
+        if validated:
+            return validated
+        logger.warning(f"Invalid IP in X-Real-IP header: {real_ip}")
 
     # Fall back to direct connection IP
     if request.client:
-        return request.client.host
+        validated = validate_ip(request.client.host)
+        if validated:
+            return validated
 
     return "unknown"
 
@@ -171,9 +195,10 @@ async def chatkit_api(request: Request):
 
         logger.info(f"Received chat request: {chat_request.message.id}")
 
-        # Check if this is an anonymous user (no user_id in request)
-        # For now, all users are anonymous until BetterAuth is integrated
-        is_anonymous = True  # TODO: Check for authenticated session
+        # Check if this is an anonymous user
+        # Frontend sends user_id in context when authenticated via BetterAuth
+        user_id = chat_request.context.get("user_id") if chat_request.context else None
+        is_anonymous = user_id is None
 
         if is_anonymous:
             # Get client IP for rate limiting

@@ -243,6 +243,7 @@ export default function FloatingChatBar(): React.ReactElement {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
+  const isCreatingThreadRef = useRef(false); // Prevent race condition in thread creation
 
   // Load messages on mount only - either from localStorage (anonymous) or thread (authenticated)
   useEffect(() => {
@@ -371,9 +372,27 @@ export default function FloatingChatBar(): React.ReactElement {
     if (isAuthenticated && userId) {
       threadId = currentThread?.id ?? null;
       if (!threadId) {
-        const newThread = await createThread();
-        if (newThread) {
-          threadId = newThread.id;
+        // Check if thread creation is already in progress (race condition prevention)
+        if (isCreatingThreadRef.current) {
+          // Another message triggered thread creation - wait briefly then retry
+          // This prevents duplicate threads from rapid message sending
+          console.log('Thread creation in progress, waiting...');
+          await new Promise(resolve => setTimeout(resolve, 100));
+          // Re-check after wait
+          threadId = currentThread?.id ?? null;
+        }
+
+        // Only create if still no thread and no creation in progress
+        if (!threadId && !isCreatingThreadRef.current) {
+          isCreatingThreadRef.current = true;
+          try {
+            const newThread = await createThread();
+            if (newThread) {
+              threadId = newThread.id;
+            }
+          } finally {
+            isCreatingThreadRef.current = false;
+          }
         }
       }
     }
@@ -436,6 +455,7 @@ export default function FloatingChatBar(): React.ReactElement {
         pageUrl: window.location.pathname,
         pageTitle: document.title,
         userName: userName || undefined, // Pass user's name for personalization
+        user_id: userId || undefined, // Pass user_id to skip rate limiting for authenticated users
       },
     };
 
