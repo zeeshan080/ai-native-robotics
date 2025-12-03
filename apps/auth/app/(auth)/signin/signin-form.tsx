@@ -68,35 +68,23 @@ export function SignInForm() {
         return;
       }
 
-      // Success - get session token and redirect
+      // Success - get session token from response and redirect
       if (result.data) {
-        try {
-          // Fetch the session token from our custom endpoint
-          const tokenResponse = await fetch('/api/session-token', {
-            credentials: 'include', // Include cookies
-          });
+        // BetterAuth returns the session token directly in the response
+        const sessionToken = result.data.session?.token || result.data.token;
 
-          if (!tokenResponse.ok) {
-            setFormError('Failed to retrieve session token');
-            return;
-          }
+        console.log('[SignIn] Result data:', JSON.stringify(result.data, null, 2));
 
-          const tokenData = await tokenResponse.json();
-          const sessionToken = tokenData.token;
-
-          if (!sessionToken) {
-            setFormError('Session token not found');
-            return;
-          }
-
-          // Redirect with token in URL (will be extracted and stored in localStorage)
-          const callbackUrl = validateCallbackUrl(searchParams.get('callbackUrl'));
-          const separator = callbackUrl.includes('?') ? '&' : '?';
-          window.location.href = `${callbackUrl}${separator}session_token=${sessionToken}`;
-        } catch (error) {
-          console.error('Failed to get session token:', error);
-          setFormError('Failed to retrieve session token');
+        if (!sessionToken) {
+          console.error('[SignIn] No token in response:', result.data);
+          setFormError('Session token not found in response');
+          return;
         }
+
+        // Redirect with token in URL (will be extracted and stored in localStorage)
+        const callbackUrl = validateCallbackUrl(searchParams.get('callbackUrl'));
+        const separator = callbackUrl.includes('?') ? '&' : '?';
+        window.location.href = `${callbackUrl}${separator}session_token=${sessionToken}`;
       }
     } catch (error) {
       console.error('Signin error:', error);
