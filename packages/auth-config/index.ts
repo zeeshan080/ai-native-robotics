@@ -19,6 +19,7 @@ const getTrustedOrigins = () => {
     'http://localhost:3000', // Docusaurus docs site
     'http://localhost:3001', // Auth service (if separate)
     'http://localhost:8000', // FastAPI backend
+    'https://zeeshan080.github.io', // GitHub Pages docs site (production)
   ];
 
   // Vercel deployment
@@ -92,6 +93,16 @@ export const auth = betterAuth({
 
   // CORS allowed origins
   trustedOrigins: getTrustedOrigins(),
+
+  // Cross-domain cookie configuration for GitHub Pages + Vercel setup
+  advanced: {
+    crossSubDomainCookies: {
+      enabled: true,
+    },
+    // Cookie configuration for cross-origin requests
+    cookiePrefix: 'better-auth',
+    useSecureCookies: process.env.NODE_ENV === 'production',
+  },
 });
 
 export type Auth = typeof auth;

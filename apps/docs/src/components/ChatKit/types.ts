@@ -86,6 +86,7 @@ export interface ChatRequest {
     pageUrl?: string;
     pageTitle?: string;
     userName?: string;
+    user_id?: string; // BetterAuth user ID for authenticated users
   };
 }
 
