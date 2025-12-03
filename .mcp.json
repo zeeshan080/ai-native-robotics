@@ -1,0 +1,23 @@
+{
+  "mcpServers": {
+    "shadcn": {
+      "command": "npx",
+      "args": [
+        "shadcn@latest",
+        "mcp"
+      ]
+    },
+    "context7": {
+      "command": "npx",
+      "args": ["-y", "@upstash/context7-mcp"]
+    },
+    "storage": {
+      "type": "sse",
+      "url": "http://localhost:8001/sse"
+    },
+    "vectordal": {
+      "type": "sse",
+      "url": "http://localhost:8002/sse"
+    }
+  }
+}

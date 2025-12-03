@@ -1,0 +1,26 @@
+# Render.com Blueprint for AI-Native Robotics Backend
+# https://render.com/docs/blueprint-spec
+
+services:
+  - type: web
+    name: ai-native-robotics-api
+    runtime: docker
+    rootDir: packages/chatkit-backend
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    branch: development
+    plan: free
+    healthCheckPath: /health
+    envVars:
+      - key: DATABASE_URL
+        sync: false  # Set manually in Render dashboard
+      - key: LLM_PROVIDER
+        value: gemini
+      - key: GEMINI_API_KEY
+        sync: false  # Set manually in Render dashboard
+      - key: GEMINI_DEFAULT_MODEL
+        value: gemini-2.5-flash
+      - key: AUTH_SERVICE_URL
+        value: https://ai-native-robotics.vercel.app
+      - key: CORS_ORIGINS
+        value: https://zeeshan080.github.io,https://ai-native-robotics.vercel.app

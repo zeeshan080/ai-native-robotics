@@ -1,0 +1,5 @@
+<svg width="200" height="200" xmlns="http://www.w3.org/2000/svg">
+  <rect width="200" height="200" fill="#2e8555"/>
+  <text x="100" y="110" font-family="Arial, sans-serif" font-size="60" font-weight="bold" fill="white" text-anchor="middle">AI</text>
+  <text x="100" y="150" font-family="Arial, sans-serif" font-size="24" fill="white" text-anchor="middle">ROBOTICS</text>
+</svg>

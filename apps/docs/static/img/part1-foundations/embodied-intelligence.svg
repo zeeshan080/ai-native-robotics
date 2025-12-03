@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400">
+  <defs>
+    <linearGradient id="digitalGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#4A90D9;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#357ABD;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="physicalGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#5CB85C;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#449D44;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="800" height="400" fill="#f8f9fa"/>
+
+  <!-- Title -->
+  <text x="400" y="35" font-family="Arial, sans-serif" font-size="24" font-weight="bold" text-anchor="middle" fill="#333">Digital AI vs Physical AI</text>
+
+  <!-- Digital AI Side -->
+  <rect x="50" y="60" width="300" height="300" rx="15" fill="url(#digitalGrad)" opacity="0.9"/>
+  <text x="200" y="95" font-family="Arial, sans-serif" font-size="18" font-weight="bold" text-anchor="middle" fill="white">Digital AI</text>
+
+  <!-- Brain icon for Digital -->
+  <circle cx="200" cy="160" r="40" fill="white" opacity="0.3"/>
+  <text x="200" y="170" font-family="Arial, sans-serif" font-size="40" text-anchor="middle" fill="white">🧠</text>
+
+  <!-- Digital AI characteristics -->
+  <text x="200" y="220" font-family="Arial, sans-serif" font-size="12" text-anchor="middle" fill="white">Text &amp; Images</text>
+  <text x="200" y="240" font-family="Arial, sans-serif" font-size="12" text-anchor="middle" fill="white">No Physical Body</text>
+  <text x="200" y="260" font-family="Arial, sans-serif" font-size="12" text-anchor="middle" fill="white">Virtual Environment</text>
+  <text x="200" y="280" font-family="Arial, sans-serif" font-size="12" text-anchor="middle" fill="white">Errors = Retry</text>
+  <text x="200" y="300" font-family="Arial, sans-serif" font-size="12" text-anchor="middle" fill="white">Unlimited Time</text>
+  <text x="200" y="320" font-family="Arial, sans-serif" font-size="12" text-anchor="middle" fill="white">Chatbots, Image Gen</text>
+
+  <!-- Arrow -->
+  <path d="M 370 200 L 430 200" stroke="#666" stroke-width="3" fill="none" marker-end="url(#arrowhead)"/>
+  <text x="400" y="185" font-family="Arial, sans-serif" font-size="14" text-anchor="middle" fill="#666">vs</text>
+
+  <!-- Physical AI Side -->
+  <rect x="450" y="60" width="300" height="300" rx="15" fill="url(#physicalGrad)" opacity="0.9"/>
+  <text x="600" y="95" font-family="Arial, sans-serif" font-size="18" font-weight="bold" text-anchor="middle" fill="white">Physical AI</text>
+
+  <!-- Robot icon for Physical -->
+  <circle cx="600" cy="160" r="40" fill="white" opacity="0.3"/>
+  <text x="600" y="170" font-family="Arial, sans-serif" font-size="40" text-anchor="middle" fill="white">🤖</text>
+
+  <!-- Physical AI characteristics -->
+  <text x="600" y="220" font-family="Arial, sans-serif" font-size="12" text-anchor="middle" fill="white">Sensors &amp; Actuators</text>
+  <text x="600" y="240" font-family="Arial, sans-serif" font-size="12" text-anchor="middle" fill="white">Embodied in Hardware</text>
+  <text x="600" y="260" font-family="Arial, sans-serif" font-size="12" text-anchor="middle" fill="white">Real World Physics</text>
+  <text x="600" y="280" font-family="Arial, sans-serif" font-size="12" text-anchor="middle" fill="white">Errors = Consequences</text>
+  <text x="600" y="300" font-family="Arial, sans-serif" font-size="12" text-anchor="middle" fill="white">Real-time Constraints</text>
+  <text x="600" y="320" font-family="Arial, sans-serif" font-size="12" text-anchor="middle" fill="white">Robots, Drones, Vehicles</text>
+</svg>

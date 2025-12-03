@@ -1,0 +1,33 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "ui": "tui",
+  "tasks": {
+    "build": {
+      "dependsOn": ["^build"],
+      "outputs": ["dist/**", ".docusaurus/**", "build/**", ".next/**"],
+      "env": [
+        "NODE_ENV",
+        "DATABASE_URL",
+        "BETTER_AUTH_SECRET",
+        "NEXT_PUBLIC_APP_URL",
+        "NEXT_PUBLIC_DOCS_URL",
+        "CORS_ALLOWED_ORIGINS"
+      ]
+    },
+    "dev": {
+      "cache": false,
+      "persistent": true
+    },
+    "lint": {
+      "dependsOn": ["^lint"],
+      "outputs": []
+    },
+    "type-check": {
+      "dependsOn": ["^type-check"],
+      "outputs": []
+    },
+    "clean": {
+      "cache": false
+    }
+  }
+}

@@ -1,0 +1,241 @@
+openapi: 3.1.0
+info:
+  title: ChatKit AI Robotics Tutor API
+  description: |
+    Backend API for the ChatKit AI Robotics Tutor feature.
+    Provides streaming chat responses using OpenAI Agents SDK.
+  version: 1.0.0
+  contact:
+    name: AI-Native Robotics Textbook Team
+
+servers:
+  - url: http://localhost:8000
+    description: Local development server
+  - url: https://api.example.com
+    description: Production server (TBD)
+
+paths:
+  /chatkit/api:
+    post:
+      operationId: chatMessage
+      summary: Send a chat message and receive streaming response
+      description: |
+        Accepts a user message and returns a streaming response from the AI tutor.
+        Uses Server-Sent Events (SSE) for streaming.
+      tags:
+        - Chat
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChatRequest'
+            examples:
+              simpleQuestion:
+                summary: Simple robotics question
+                value:
+                  type: user_message
+                  message:
+                    id: "550e8400-e29b-41d4-a716-446655440000"
+                    content: "What is bipedal locomotion?"
+              contextualQuestion:
+                summary: Question with page context
+                value:
+                  type: user_message
+                  message:
+                    id: "550e8400-e29b-41d4-a716-446655440001"
+                    content: "Can you explain this concept more?"
+                  context:
+                    pageUrl: "/docs/Physical-AI-Foundations/what-is-physical-ai/lesson-embodiment-hypothesis"
+                    pageTitle: "The Embodiment Hypothesis"
+              explainSelection:
+                summary: Explain selected text
+                value:
+                  type: user_message
+                  message:
+                    id: "550e8400-e29b-41d4-a716-446655440002"
+                    content: "Explain: The embodiment hypothesis proposes that intelligence emerges from the interaction between a body and its environment"
+                  context:
+                    pageUrl: "/docs/Physical-AI-Foundations/what-is-physical-ai/lesson-embodiment-hypothesis"
+                    pageTitle: "The Embodiment Hypothesis"
+              translateSelection:
+                summary: Translate selected text to Urdu
+                value:
+                  type: user_message
+                  message:
+                    id: "550e8400-e29b-41d4-a716-446655440003"
+                    content: "Translate to Urdu: bipedal locomotion"
+              summarizeSelection:
+                summary: Summarize selected text
+                value:
+                  type: user_message
+                  message:
+                    id: "550e8400-e29b-41d4-a716-446655440004"
+                    content: "Summarize: Physical AI systems must operate within strict constraints that digital AI systems rarely face—constraints of time, energy, safety, and the fundamental unpredictability of physical environments."
+      responses:
+        '200':
+          description: Streaming response with chat events
+          content:
+            text/event-stream:
+              schema:
+                $ref: '#/components/schemas/ChatEventStream'
+              examples:
+                streamingResponse:
+                  summary: Typical streaming response
+                  value: |
+                    data: {"type":"text_delta","content":"Bipedal","done":false,"messageId":"123"}
+
+                    data: {"type":"text_delta","content":" locomotion","done":false,"messageId":"123"}
+
+                    data: {"type":"text_delta","content":" is walking on two legs.","done":false,"messageId":"123"}
+
+                    data: {"type":"message_complete","done":true,"messageId":"123"}
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: "Invalid message format"
+                details: "message.content is required"
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: "Internal server error"
+                details: "Failed to connect to AI provider"
+
+  /health:
+    get:
+      operationId: healthCheck
+      summary: Health check endpoint
+      description: Returns service health status
+      tags:
+        - System
+      responses:
+        '200':
+          description: Service is healthy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+              example:
+                status: "healthy"
+                provider: "openai"
+                timestamp: "2025-11-29T12:00:00Z"
+
+components:
+  schemas:
+    ChatRequest:
+      type: object
+      required:
+        - type
+        - message
+      properties:
+        type:
+          type: string
+          enum: [user_message]
+          description: Type of request
+          example: user_message
+        message:
+          $ref: '#/components/schemas/MessageContent'
+        context:
+          $ref: '#/components/schemas/PageContext'
+
+    MessageContent:
+      type: object
+      required:
+        - id
+        - content
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Client-generated message ID
+          example: "550e8400-e29b-41d4-a716-446655440000"
+        content:
+          type: string
+          maxLength: 2000
+          description: |
+            User's message text. May include action prefixes for text selection actions:
+            - "Explain: [text]" - Request explanation of selected text
+            - "Translate to Urdu: [text]" - Request Urdu translation
+            - "Summarize: [text]" - Request summary of selected text
+          example: "What is bipedal locomotion?"
+
+    PageContext:
+      type: object
+      description: Optional context about current page
+      properties:
+        pageUrl:
+          type: string
+          description: Current page URL path
+          example: "/docs/Physical-AI-Foundations/what-is-physical-ai/lesson-embodiment-hypothesis"
+        pageTitle:
+          type: string
+          description: Current page title
+          example: "The Embodiment Hypothesis"
+
+    ChatEvent:
+      type: object
+      required:
+        - type
+        - done
+      properties:
+        type:
+          type: string
+          enum: [text_delta, message_complete, error]
+          description: Type of event
+        content:
+          type: string
+          description: Text content (for text_delta and error)
+        done:
+          type: boolean
+          description: Whether streaming is complete
+        messageId:
+          type: string
+          format: uuid
+          description: ID of the message being streamed
+
+    ChatEventStream:
+      type: array
+      description: Stream of chat events (SSE format)
+      items:
+        $ref: '#/components/schemas/ChatEvent'
+
+    ErrorResponse:
+      type: object
+      required:
+        - error
+      properties:
+        error:
+          type: string
+          description: Error message
+        details:
+          type: string
+          description: Additional error details
+
+    HealthResponse:
+      type: object
+      required:
+        - status
+      properties:
+        status:
+          type: string
+          enum: [healthy, degraded, unhealthy]
+        provider:
+          type: string
+          description: Current LLM provider
+        timestamp:
+          type: string
+          format: date-time
+
+tags:
+  - name: Chat
+    description: Chat message endpoints
+  - name: System
+    description: System health and status endpoints

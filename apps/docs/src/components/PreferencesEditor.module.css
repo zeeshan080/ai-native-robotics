@@ -1,0 +1,154 @@
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.header {
+  margin-bottom: 2rem;
+}
+
+.title {
+  font-size: 1.75rem;
+  margin-bottom: 0.5rem;
+  color: var(--ifm-heading-color);
+}
+
+.subtitle {
+  color: var(--ifm-color-emphasis-600);
+  font-size: 1rem;
+}
+
+.loading {
+  text-align: center;
+  color: var(--ifm-color-emphasis-600);
+  padding: 2rem;
+}
+
+.error {
+  color: var(--ifm-color-danger);
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+  background: var(--ifm-color-danger-lightest);
+  border-radius: 6px;
+  border: 1px solid var(--ifm-color-danger-light);
+}
+
+.success {
+  color: var(--ifm-color-success-darkest);
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+  background: var(--ifm-color-success-lightest);
+  border-radius: 6px;
+  border: 1px solid var(--ifm-color-success-light);
+}
+
+.preferencesGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.preferenceCard {
+  background: var(--ifm-card-background-color);
+  border-radius: 10px;
+  padding: 1.5rem;
+  box-shadow: var(--ifm-global-shadow-lw);
+}
+
+.questionTitle {
+  font-size: 1.1rem;
+  margin-bottom: 0.25rem;
+  color: var(--ifm-heading-color);
+}
+
+.questionDescription {
+  color: var(--ifm-color-emphasis-600);
+  font-size: 0.875rem;
+  margin-bottom: 1rem;
+}
+
+.optionsRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.optionChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border: 2px solid var(--ifm-color-emphasis-300);
+  border-radius: 20px;
+  background: transparent;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+  color: var(--ifm-color-emphasis-800);
+}
+
+.optionChip:hover {
+  border-color: var(--ifm-color-primary);
+}
+
+.optionSelected {
+  border-color: var(--ifm-color-primary);
+  background: var(--ifm-color-primary);
+  color: white;
+}
+
+.optionSelected:hover {
+  background: var(--ifm-color-primary-dark);
+  border-color: var(--ifm-color-primary-dark);
+}
+
+.checkmark {
+  font-size: 0.75rem;
+  font-weight: bold;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--ifm-color-emphasis-200);
+}
+
+.resetButton,
+.saveButton {
+  padding: 0.75rem 1.5rem;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.resetButton {
+  background: transparent;
+  border: 2px solid var(--ifm-color-emphasis-400);
+  color: var(--ifm-color-emphasis-700);
+}
+
+.resetButton:hover:not(:disabled) {
+  border-color: var(--ifm-color-emphasis-600);
+}
+
+.saveButton {
+  background: var(--ifm-color-primary);
+  border: 2px solid var(--ifm-color-primary);
+  color: white;
+}
+
+.saveButton:hover:not(:disabled) {
+  background: var(--ifm-color-primary-dark);
+  border-color: var(--ifm-color-primary-dark);
+}
+
+.resetButton:disabled,
+.saveButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
