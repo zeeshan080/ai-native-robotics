@@ -308,7 +308,15 @@ Task: "Create FloatingChatBar component in apps/docs/src/components/ChatKit/Floa
 | US3 | 5 | 2 parallel groups |
 | US4 (Selection) | 9 | 3 parallel |
 | Polish | 8 | 5 parallel |
-| **Total** | **51** | |
+| **Total Phase 1** | **51** | |
+| US4.5 (View Modes) | 19 | 6 parallel |
+| Session Foundation | 8 | 3 parallel |
+| US5 (Anonymous Trial) | 18 | 4 parallel |
+| US6 (Persistence) | 13 | 3 parallel |
+| US7 (Management) | 8 | 2 parallel |
+| Session Polish | 8 | 4 parallel |
+| **Total Phase 2** | **74** | |
+| **Grand Total** | **125** | |
 
 ---
 
@@ -321,3 +329,234 @@ Task: "Create FloatingChatBar component in apps/docs/src/components/ChatKit/Floa
 - US4 is especially impressive for demos - highlight text → instant AI action
 - Commit after each task or logical group
 - Stop at any checkpoint to validate story independently
+
+---
+
+# Phase 2: UI Enhancement & Session Management (2025-12-01)
+
+---
+
+## Phase 8: User Story 4.5 - Chat View Modes (Priority: P1-Phase2)
+
+**Goal**: Implement three chat view modes: compact (narrow bar), fullpage (centered modal), and sidedock (left/right panel)
+
+**Independent Test**: Click expand button in compact mode → verify fullpage modal appears with blur. Click dock-right → verify panel docks to right side. Click minimize → verify returns to compact bar.
+
+### State & Context for US4.5
+
+- [x] T052 [P] [US4.5] Create ChatViewMode type and context in apps/docs/src/components/ChatKit/ChatViewModeContext.tsx
+- [x] T053 [US4.5] Implement localStorage persistence for view mode preference
+- [x] T054 [US4.5] Add useChatViewMode hook for components to access/change mode
+
+### CSS Styles for US4.5
+
+- [x] T055 [P] [US4.5] Add compact mode styles (.chatkit-compact, max-width: 400px) to chatkit.css
+- [x] T056 [P] [US4.5] Add fullpage mode styles (.chatkit-fullpage, centered, backdrop-blur) to chatkit.css
+- [x] T057 [P] [US4.5] Add sidedock-left styles (.chatkit-sidedock-left, fixed left, 350px) to chatkit.css
+- [x] T058 [P] [US4.5] Add sidedock-right styles (.chatkit-sidedock-right, fixed right, 350px) to chatkit.css
+- [x] T059 [US4.5] Add mode transition animations (300ms) to chatkit.css
+- [x] T060 [US4.5] Add mobile responsive rules (<768px → force fullpage) to chatkit.css
+
+### Component Updates for US4.5
+
+- [x] T061 [US4.5] Update FloatingChatBar to use ChatViewModeContext
+- [x] T062 [US4.5] Add mode toggle buttons (expand, dock-left, dock-right, minimize) to ChatPanel header
+- [x] T063 [US4.5] Implement click-outside handler to minimize fullpage mode
+- [x] T064 [US4.5] Implement Escape key handler to minimize fullpage mode
+- [x] T065 [US4.5] Add blurred backdrop overlay component for fullpage mode
+- [x] T066 [US4.5] Hide dock buttons on mobile viewports
+- [x] T067 [US4.5] Update Root.tsx to wrap ChatKit with ChatViewModeContext provider
+
+### Integration for US4.5
+
+- [x] T068 [US4.5] Test all mode transitions: compact↔fullpage, fullpage↔sidedock, sidedock↔compact
+- [x] T069 [US4.5] Test localStorage persistence: change mode, refresh, verify mode preserved
+- [x] T070 [US4.5] Test mobile viewport: resize to <768px, verify sidedock falls back to fullpage
+
+**Checkpoint**: User Story 4.5 complete - Users can choose their preferred chat view mode
+
+---
+
+## Phase 9: Session Management Foundation
+
+**Purpose**: Database models and Store interface for thread persistence
+
+**⚠️ CRITICAL**: Must be complete before US5-US7 can be implemented
+
+### Database Models
+
+- [x] T071 [P] [US5] Add ChatThread SQLAlchemy model to packages/chatkit-backend/src/chatkit_backend/db/models.py
+- [x] T072 [P] [US5] Add ChatThreadItem SQLAlchemy model to packages/chatkit-backend/src/chatkit_backend/db/models.py
+- [x] T073 [US5] Create Alembic migration for chat_threads and chat_thread_items tables
+
+### Store Interface
+
+- [x] T074 [P] [US5] Create stores/ directory at packages/chatkit-backend/src/chatkit_backend/stores/
+- [x] T075 [US5] Create base Store interface (ABC) in packages/chatkit-backend/src/chatkit_backend/stores/base.py
+- [x] T076 [US5] Implement InMemoryStore for anonymous users in packages/chatkit-backend/src/chatkit_backend/stores/memory.py
+- [x] T077 [US5] Implement PostgresStore with SQLAlchemy async in packages/chatkit-backend/src/chatkit_backend/stores/postgres.py
+- [x] T078 [US5] Create stores __init__.py with exports at packages/chatkit-backend/src/chatkit_backend/stores/__init__.py
+
+**Checkpoint**: Store infrastructure ready - thread APIs can now be implemented
+
+---
+
+## Phase 10: User Story 5 - Anonymous User Trial with Message Limit (Priority: P1-Phase2)
+
+**Goal**: Allow anonymous users to try the chat with a 10 message limit, show warnings, and migrate messages on sign-in
+
+**Independent Test**: Send 7 messages as anonymous → verify warning appears. Send 3 more → verify limit prompt. Sign in → verify previous messages migrated.
+
+### Frontend Anonymous Flow for US5
+
+- [ ] T079 [P] [US5] Create useAnonymousMessages hook for localStorage-based message storage in apps/docs/src/components/ChatKit/useAnonymousMessages.ts
+- [ ] T080 [US5] Add message counter state tracking (0-10) in useAnonymousMessages
+- [ ] T081 [US5] Add warning message component when remaining messages < 4 in apps/docs/src/components/ChatKit/MessageLimitWarning.tsx
+- [ ] T082 [US5] Add limit reached overlay/modal with sign-in CTA in apps/docs/src/components/ChatKit/MessageLimitReached.tsx
+- [ ] T083 [US5] Update FloatingChatBar to use anonymous messages when not authenticated
+- [ ] T084 [US5] Integrate warning and limit components into ChatPanel
+
+### Backend Migration API for US5
+
+- [ ] T085 [P] [US5] Add POST /threads/migrate endpoint for migrating anonymous messages at packages/chatkit-backend/src/chatkit_backend/routers/threads.py
+- [ ] T086 [US5] Implement migration logic: accept array of messages, create thread, save all messages with timestamps
+- [ ] T087 [US5] Add migration validation: ensure user is authenticated before accepting migration
+
+### Frontend Migration for US5
+
+- [ ] T088 [US5] Create useMigrateMessages hook for calling migration endpoint in apps/docs/src/components/ChatKit/useMigrateMessages.ts
+- [ ] T089 [US5] Update FloatingChatBar to detect auth state change and trigger migration
+- [ ] T090 [US5] Clear localStorage anonymous messages after successful migration
+- [ ] T091 [US5] Show migration success feedback to user
+
+### Integration for US5
+
+- [ ] T092 [US5] Test anonymous message count tracking (localStorage)
+- [ ] T093 [US5] Test warning appears at 7 messages sent
+- [ ] T094 [US5] Test limit blocks at 10 messages
+- [ ] T095 [US5] Test migration preserves message order and content
+- [ ] T096 [US5] Test migrated thread appears in user's history
+
+**Checkpoint**: User Story 5 complete - Anonymous users can try chat with limit and migrate on sign-in
+
+---
+
+## Phase 11: User Story 6 - Persistent Conversations for Authenticated Users (Priority: P2-Phase2)
+
+**Goal**: Enable authenticated users to have their conversations automatically saved and restored across sessions
+
+**Independent Test**: Sign in, start conversation, refresh page → verify conversation restored. Click "New Chat" → verify new thread created. View history → verify all threads listed.
+
+### Backend for US6 (Already implemented in Phase 9)
+
+The thread API endpoints were already implemented in Phase 9:
+- POST /threads - Create thread ✓
+- GET /threads - List threads with pagination ✓
+- GET /threads/{id} - Get thread with messages ✓
+
+### Frontend for US6
+
+- [ ] T097 [P] [US6] Create useThreads hook in apps/docs/src/components/ChatKit/useThreads.ts
+- [ ] T098 [US6] Update FloatingChatBar to auto-save messages to thread when authenticated
+- [ ] T099 [US6] Update FloatingChatBar to restore current thread on mount when authenticated
+- [ ] T100 [US6] Add thread loading state and error handling
+- [ ] T101 [P] [US6] Create ThreadList component in apps/docs/src/components/ChatKit/ThreadList.tsx
+- [ ] T102 [US6] Add thread list panel to ChatPanel (sidebar or dropdown)
+- [ ] T103 [US6] Implement thread switching (load selected thread messages)
+- [ ] T104 [US6] Add "New Chat" button to start fresh thread
+- [ ] T105 [US6] Add auto-generated titles based on first message (via ThreadService)
+
+### Integration for US6
+
+- [ ] T106 [US6] Test thread creation on first message
+- [ ] T107 [US6] Test message persistence across page refresh
+- [ ] T108 [US6] Test thread list displays correctly with titles
+- [ ] T109 [US6] Test thread switching loads correct messages
+
+**Checkpoint**: User Story 6 complete - Conversations persist for authenticated users
+
+---
+
+## Phase 12: User Story 7 - Thread Management (Priority: P3-Phase2)
+
+**Goal**: Enable authenticated users to rename threads for easier identification or delete old conversations
+
+**Independent Test**: Rename a thread → verify title updates and persists. Delete a thread → verify removed from list and cannot be accessed.
+
+### Backend API for US7
+
+- [ ] T110 [P] [US7] Add PATCH /threads/{id} endpoint for renaming at packages/chatkit-backend/src/chatkit_backend/routers/threads.py
+- [ ] T111 [P] [US7] Add DELETE /threads/{id} endpoint for deletion at packages/chatkit-backend/src/chatkit_backend/routers/threads.py
+
+### Frontend for US7
+
+- [ ] T112 [US7] Add rename button/input to thread list items in ThreadList.tsx
+- [ ] T113 [US7] Add delete button with confirmation modal to thread list items
+- [ ] T114 [US7] Implement optimistic updates for rename/delete operations
+- [ ] T115 [US7] Handle edge case: deleting current active thread (switch to new thread)
+
+### Integration for US7
+
+- [ ] T116 [US7] Test rename operation persists across refresh
+- [ ] T117 [US7] Test delete operation removes thread from list and API
+
+**Checkpoint**: User Story 7 complete - Users can manage their conversation threads
+
+---
+
+## Phase 13: Session Management Polish
+
+**Purpose**: Error handling, edge cases, and UX improvements for session features
+
+### Error Handling
+
+- [ ] T118 [P] Add offline detection and queue messages for later
+- [ ] T119 [P] Add retry logic for failed saves
+- [ ] T120 Add sync conflict resolution (server wins)
+
+### UX Improvements
+
+- [ ] T121 [P] Add thread search/filter functionality
+- [ ] T122 Add keyboard shortcuts for thread navigation (Ctrl+Shift+N for new chat)
+- [ ] T123 Add thread timestamps and relative dates ("2 hours ago")
+
+### Performance
+
+- [ ] T124 [P] Implement message pagination within threads
+- [ ] T125 Add virtual scrolling for long conversations
+
+**Checkpoint**: Phase 2 complete - Full session management with polish
+
+---
+
+## Task Summary (Updated)
+
+### Phase 2 Task Counts
+
+| Phase | Task Count | Task IDs | Description |
+|-------|------------|----------|-------------|
+| Phase 8 (US4.5 View Modes) | 19 | T052-T070 | ✓ COMPLETE |
+| Phase 9 (Session Foundation) | 8 | T071-T078 | ✓ COMPLETE |
+| Phase 10 (US5 Anonymous Trial) | 18 | T079-T096 | Anonymous flow + migration |
+| Phase 11 (US6 Persistence) | 13 | T097-T109 | Auth user persistence |
+| Phase 12 (US7 Management) | 8 | T110-T117 | Rename/delete threads |
+| Phase 13 (Polish) | 8 | T118-T125 | Error handling, UX |
+| **Total Phase 2** | **74** | | |
+
+### Implementation Priority
+
+1. **Phase 10 (US5)** - Anonymous User Trial (P1) - IMPLEMENT FIRST
+   - Enables try-before-sign-up funnel
+   - Critical for user acquisition
+
+2. **Phase 11 (US6)** - Persistent Conversations (P2)
+   - Provides value proposition for signing in
+   - Builds on Phase 10
+
+3. **Phase 12 (US7)** - Thread Management (P3)
+   - Nice-to-have for power users
+   - Can be deferred if time-constrained
+
+4. **Phase 13 (Polish)**
+   - Only after core features work
+   - Add as time permits

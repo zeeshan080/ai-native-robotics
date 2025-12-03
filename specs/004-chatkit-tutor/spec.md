@@ -78,6 +78,60 @@ A student is reading a lesson and encounters a technical term or complex paragra
 
 ---
 
+### User Story 5 - Anonymous User Trial with Message Limit (Priority: P1)
+
+An anonymous visitor discovers the AI tutor and starts asking questions. They can use the chat for up to 10 messages to try the feature. After reaching the limit, they are prompted to sign in to continue. If they sign in, their previous conversation is migrated to persistent storage so they don't lose their chat history.
+
+**Why this priority**: Critical for user acquisition funnel - allows trying before committing while encouraging sign-ups. Prevents abuse of anonymous access while providing value.
+
+**Independent Test**: Can be tested by sending 10 messages as anonymous user, verifying limit prompt appears, signing in, and verifying previous messages are preserved.
+
+**Acceptance Scenarios**:
+
+1. **Given** I am an anonymous user, **When** I send my first message, **Then** the chat works normally with no persistence warnings
+2. **Given** I am an anonymous user with 7 messages sent, **When** I view the chat, **Then** I see a warning "3 messages remaining. Sign in to save your chat."
+3. **Given** I am an anonymous user with 10 messages sent, **When** I try to send another message, **Then** I see a prompt to sign in with message "Message limit reached. Sign in to continue chatting and save your conversation."
+4. **Given** I am blocked by the message limit, **When** I click the sign in button, **Then** I am redirected to the authentication flow
+5. **Given** I had messages as an anonymous user, **When** I complete sign in, **Then** my previous messages are migrated to a new persistent thread
+6. **Given** I signed in after anonymous usage, **When** I view my chat history, **Then** I see all my previous anonymous messages preserved
+
+---
+
+### User Story 6 - Persistent Conversations for Authenticated Users (Priority: P2)
+
+An authenticated user wants their conversation history saved so they can continue where they left off. When they return to the site, their previous conversations are available and they can switch between threads.
+
+**Why this priority**: Essential for engaged users who want to reference past interactions. Builds on US5 by providing the value proposition for signing in.
+
+**Independent Test**: Can be tested by signing in, having a conversation, refreshing the page, and verifying the conversation persists.
+
+**Acceptance Scenarios**:
+
+1. **Given** I am signed in, **When** I send a message, **Then** it is automatically saved to my account
+2. **Given** I am signed in with existing threads, **When** I return to the site, **Then** my most recent conversation is restored
+3. **Given** I am signed in, **When** I click "New Chat", **Then** a new thread is created and I can start fresh
+4. **Given** I am signed in, **When** I view thread history, **Then** I see a list of my previous conversations with titles
+5. **Given** I am viewing thread history, **When** I click a previous thread, **Then** that conversation is loaded into the chat
+
+---
+
+### User Story 7 - Thread Management (Priority: P3)
+
+An authenticated user wants to manage their conversation history by renaming threads for easier identification or deleting old conversations they no longer need.
+
+**Why this priority**: Nice-to-have for power users who have many conversations. Not critical for core experience.
+
+**Independent Test**: Can be tested by creating multiple threads, renaming one, deleting another, and verifying changes persist.
+
+**Acceptance Scenarios**:
+
+1. **Given** I am viewing my thread list, **When** I click rename on a thread, **Then** I can edit the title inline
+2. **Given** I renamed a thread, **When** I save the new title, **Then** the change persists across sessions
+3. **Given** I am viewing my thread list, **When** I click delete on a thread, **Then** I see a confirmation prompt
+4. **Given** I confirmed thread deletion, **When** the action completes, **Then** the thread is removed from my history
+
+---
+
 ### Edge Cases
 
 - What happens when the backend service is unavailable? → Display friendly error message and suggest trying again

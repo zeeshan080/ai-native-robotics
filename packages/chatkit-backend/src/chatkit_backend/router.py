@@ -2,6 +2,7 @@
 Event router for ChatKit API.
 
 Handles incoming chat requests and streams responses from the tutor agent.
+Uses RAG to retrieve relevant textbook content for context.
 """
 
 import logging
@@ -9,8 +10,9 @@ from typing import AsyncIterator
 
 from agents import Runner, RawResponsesStreamEvent
 
-from .models import ChatRequest, ChatEvent, EventType
+from .models import ChatRequest, ChatEvent, EventType, Reference
 from .agents import create_tutor_agent
+from .services import get_rag_context
 
 
 logger = logging.getLogger(__name__)
@@ -53,16 +55,54 @@ async def handle_chat_request(request: ChatRequest) -> AsyncIterator[ChatEvent]:
         message_id = request.message.id
 
         # Add page context if provided
-        if request.context and request.context.pageUrl:
-            context_info = f"\n\n[Student is viewing: {request.context.pageTitle or request.context.pageUrl}]"
-            user_message += context_info
+        if request.context:
+            context_parts = []
+            if request.context.userName:
+                context_parts.append(f"Student's name: {request.context.userName}")
+            if request.context.pageUrl:
+                context_parts.append(f"Currently viewing: {request.context.pageTitle or request.context.pageUrl}")
+            if context_parts:
+                context_info = "\n\n[" + " | ".join(context_parts) + "]"
+                user_message += context_info
 
         logger.info(f"Processing chat request {message_id}: {user_message[:100]}...")
+
+        # RAG: Retrieve relevant textbook content
+        rag_context, rag_references = await get_rag_context(user_message)
+        if rag_context:
+            logger.info(f"RAG context found for request {message_id}: {len(rag_references)} references")
+        else:
+            logger.info(f"No RAG context found for request {message_id}")
+
+        # Build conversation history for the agent
+        # Format: list of {"role": "user"|"assistant", "content": "..."}
+        conversation_input = []
+
+        # Add history messages (excluding system messages)
+        for hist_msg in request.history:
+            if hist_msg.role in ("user", "assistant"):
+                conversation_input.append({
+                    "role": hist_msg.role,
+                    "content": hist_msg.content
+                })
+
+        # Inject RAG context before the user's question
+        if rag_context:
+            conversation_input.append({
+                "role": "user",
+                "content": f"[CONTEXT FROM TEXTBOOK]\n{rag_context}\n\n[STUDENT QUESTION]\n{user_message}"
+            })
+        else:
+            # Add the current user message without RAG context
+            conversation_input.append({
+                "role": "user",
+                "content": user_message
+            })
 
         # Run the agent with streaming (openai-agents SDK v0.6+)
         result = Runner.run_streamed(
             starting_agent=agent,
-            input=user_message
+            input=conversation_input
         )
 
         # Stream the response chunks
@@ -87,6 +127,16 @@ async def handle_chat_request(request: ChatRequest) -> AsyncIterator[ChatEvent]:
 
         # Log the final response
         logger.info(f"Completed response for {message_id}: {len(accumulated_response)} chars")
+
+        # Send references if we have them
+        if rag_references:
+            yield ChatEvent(
+                type=EventType.REFERENCES,
+                content=None,
+                done=False,
+                messageId=message_id,
+                references=[Reference(**ref) for ref in rag_references]
+            )
 
         # Yield completion event
         yield ChatEvent(

@@ -54,6 +54,7 @@ class User(Base):
         back_populates="user",
         cascade="all, delete-orphan",
     )
+    # Note: chat_threads relationship removed since BetterAuth users are external
 
     def __repr__(self) -> str:
         return f"<User(id={self.id}, onboarding_completed={self.onboarding_completed})>"
@@ -343,3 +344,149 @@ class UserProgress(Base):
 
     def __repr__(self) -> str:
         return f"<UserProgress(user_id={self.user_id}, lesson_id={self.lesson_id}, status={self.status})>"
+
+
+# =============================================================================
+# Anonymous Rate Limiting
+# =============================================================================
+
+
+class AnonymousRateLimit(Base):
+    """Rate limiting for anonymous (unauthenticated) users.
+
+    Tracks message count by IP address to enforce the 10-message trial limit.
+    This prevents users from bypassing the limit by clearing localStorage.
+    """
+
+    __tablename__ = "anonymous_rate_limits"
+
+    id: Mapped[str] = mapped_column(
+        UUID(as_uuid=False),
+        primary_key=True,
+        default=lambda: str(uuid4()),
+    )
+    ip_address: Mapped[str] = mapped_column(
+        String(45),  # IPv6 max length
+        unique=True,
+        index=True,
+    )
+    message_count: Mapped[int] = mapped_column(
+        Integer,
+        default=0,
+    )
+    first_message_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        server_default=func.now(),
+    )
+    last_message_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        server_default=func.now(),
+        onupdate=func.now(),
+    )
+
+    def __repr__(self) -> str:
+        return f"<AnonymousRateLimit(ip={self.ip_address}, count={self.message_count})>"
+
+
+# =============================================================================
+# Chat Thread Models (Session Management)
+# =============================================================================
+
+
+class ChatThread(Base):
+    """Chat thread model for storing conversation sessions.
+
+    Each thread represents a conversation between a user and the AI tutor.
+    Threads can have a title (auto-generated or user-defined) and store
+    metadata like the previous_response_id for conversation continuity.
+
+    Note: user_id is a String (not UUID) to support both:
+    - Anonymous users with UUID strings from our system
+    - BetterAuth users with non-UUID strings like '0Dl6dRx1wnFPoz4A68X9mYMmsLBhBP2T'
+    """
+
+    __tablename__ = "chat_threads"
+
+    id: Mapped[str] = mapped_column(
+        UUID(as_uuid=False),
+        primary_key=True,
+        default=lambda: str(uuid4()),
+    )
+    # String type to accept both UUIDs and BetterAuth IDs (no FK since BetterAuth users are external)
+    user_id: Mapped[str] = mapped_column(
+        String(255),
+        index=True,
+    )
+    title: Mapped[Optional[str]] = mapped_column(
+        String(255),
+        nullable=True,
+    )
+    thread_metadata: Mapped[Optional[dict]] = mapped_column(
+        "metadata",  # Database column name stays 'metadata'
+        JSONB,
+        nullable=True,
+        default=dict,
+    )  # Stores previous_response_id, context, etc.
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        server_default=func.now(),
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        server_default=func.now(),
+        onupdate=func.now(),
+    )
+
+    # Relationships (no user relationship since user_id can be external BetterAuth ID)
+    items: Mapped[list["ChatThreadItem"]] = relationship(
+        "ChatThreadItem",
+        back_populates="thread",
+        cascade="all, delete-orphan",
+        order_by="ChatThreadItem.created_at",
+    )
+
+    def __repr__(self) -> str:
+        return f"<ChatThread(id={self.id}, user_id={self.user_id}, title={self.title})>"
+
+
+class ChatThreadItem(Base):
+    """Chat thread item model for storing individual messages.
+
+    Each item represents a single message in a conversation thread,
+    storing the role (user/assistant), content, and associated metadata.
+    """
+
+    __tablename__ = "chat_thread_items"
+
+    id: Mapped[str] = mapped_column(
+        UUID(as_uuid=False),
+        primary_key=True,
+        default=lambda: str(uuid4()),
+    )
+    thread_id: Mapped[str] = mapped_column(
+        UUID(as_uuid=False),
+        ForeignKey("chat_threads.id", ondelete="CASCADE"),
+        index=True,
+    )
+    role: Mapped[str] = mapped_column(
+        String(20),
+    )  # 'user', 'assistant', 'system'
+    content: Mapped[str] = mapped_column(
+        Text,
+    )
+    item_metadata: Mapped[Optional[dict]] = mapped_column(
+        "metadata",  # Database column name stays 'metadata'
+        JSONB,
+        nullable=True,
+        default=dict,
+    )  # Stores message_id, context, timestamps, etc.
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        server_default=func.now(),
+    )
+
+    # Relationships
+    thread: Mapped["ChatThread"] = relationship("ChatThread", back_populates="items")
+
+    def __repr__(self) -> str:
+        return f"<ChatThreadItem(id={self.id}, thread_id={self.thread_id}, role={self.role})>"

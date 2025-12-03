@@ -17,6 +17,8 @@ from chatkit_backend.db.models import (
     Chapter,
     Lesson,
     UserProgress,
+    ChatThread,
+    ChatThreadItem,
 )
 
 __all__ = [
@@ -34,4 +36,6 @@ __all__ = [
     "Chapter",
     "Lesson",
     "UserProgress",
+    "ChatThread",
+    "ChatThreadItem",
 ]

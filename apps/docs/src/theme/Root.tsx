@@ -1,5 +1,10 @@
 import React, { useCallback } from 'react';
-import { FloatingChatBar, SelectionTooltip, useTextSelection } from '../components/ChatKit';
+import {
+  FloatingChatBar,
+  SelectionTooltip,
+  useTextSelection,
+  ChatViewModeProvider,
+} from '../components/ChatKit';
 import type { SelectionAction } from '../components/ChatKit/SelectionTooltip';
 import { UserProvider } from '../context/UserContext';
 import '../css/chatkit.css';
@@ -9,6 +14,9 @@ import '../css/chatkit.css';
  *
  * Injects the ChatKit floating chat bar and text selection tooltip
  * globally across all Docusaurus pages.
+ *
+ * Wraps ChatKit with ChatViewModeProvider (T067) to enable
+ * compact, fullpage, and sidedock view modes with localStorage persistence.
  */
 export default function Root({ children }: { children: React.ReactNode }): React.ReactElement {
   const { selection, clearSelection } = useTextSelection();
@@ -42,7 +50,9 @@ export default function Root({ children }: { children: React.ReactNode }): React
         onAction={handleSelectionAction}
         onClose={clearSelection}
       />
-      <FloatingChatBar />
+      <ChatViewModeProvider>
+        <FloatingChatBar />
+      </ChatViewModeProvider>
     </UserProvider>
   );
 }

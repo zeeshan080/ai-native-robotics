@@ -34,7 +34,18 @@ class EventType(str, Enum):
 
     TEXT_DELTA = "text_delta"
     MESSAGE_COMPLETE = "message_complete"
+    REFERENCES = "references"
     ERROR = "error"
+
+
+class Reference(BaseModel):
+    """A reference to textbook content."""
+
+    title: str
+    url: str
+    location: str | None = None
+    content_type: str | None = None
+    score: float | None = None
 
 
 class MessageContent(BaseModel):
@@ -44,11 +55,19 @@ class MessageContent(BaseModel):
     content: str = Field(..., max_length=2000, description="Message text content")
 
 
+class HistoryMessage(BaseModel):
+    """A message in the conversation history."""
+
+    role: MessageRole
+    content: str = Field(..., description="Message text content")
+
+
 class PageContext(BaseModel):
-    """Context about the current page (optional)."""
+    """Context about the current page and user (optional)."""
 
     pageUrl: str | None = Field(None, description="Current page URL path")
     pageTitle: str | None = Field(None, description="Current page title")
+    userName: str | None = Field(None, description="User's name for personalization")
 
 
 class ChatRequest(BaseModel):
@@ -56,6 +75,7 @@ class ChatRequest(BaseModel):
 
     type: str = Field(default="user_message", description="Request type")
     message: MessageContent
+    history: list[HistoryMessage] = Field(default_factory=list, description="Conversation history")
     context: PageContext | None = Field(None, description="Optional page context")
 
 
@@ -66,3 +86,4 @@ class ChatEvent(BaseModel):
     content: str | None = Field(None, description="Text content or error message")
     done: bool = Field(..., description="Whether stream is finished")
     messageId: UUID | None = Field(None, description="ID of the message being streamed")
+    references: list[Reference] | None = Field(None, description="References to textbook content")
