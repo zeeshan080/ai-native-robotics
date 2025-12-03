@@ -68,6 +68,7 @@ class PageContext(BaseModel):
     pageUrl: str | None = Field(None, description="Current page URL path")
     pageTitle: str | None = Field(None, description="Current page title")
     userName: str | None = Field(None, description="User's name for personalization")
+    user_id: str | None = Field(None, description="Authenticated user ID from BetterAuth")
 
 
 class ChatRequest(BaseModel):

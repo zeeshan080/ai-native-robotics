@@ -197,7 +197,7 @@ async def chatkit_api(request: Request):
 
         # Check if this is an anonymous user
         # Frontend sends user_id in context when authenticated via BetterAuth
-        user_id = chat_request.context.get("user_id") if chat_request.context else None
+        user_id = chat_request.context.user_id if chat_request.context else None
         is_anonymous = user_id is None
 
         if is_anonymous:

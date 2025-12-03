@@ -47,16 +47,21 @@ export function NavbarAuthButton(): React.ReactElement {
   useEffect(() => {
     async function fetchSession() {
       try {
+        console.log('[NavbarAuth] Fetching session from:', AUTH_URL);
         const session = await authClient.getSession();
+        console.log('[NavbarAuth] Session response:', session);
         if (session.data?.user) {
+          console.log('[NavbarAuth] User authenticated:', session.data.user.email);
           setUser({
             id: session.data.user.id,
             email: session.data.user.email,
             name: session.data.user.name || '',
           });
+        } else {
+          console.log('[NavbarAuth] No user in session, error:', session.error);
         }
       } catch (error) {
-        console.error('Failed to fetch session:', error);
+        console.error('[NavbarAuth] Failed to fetch session:', error);
       } finally {
         setIsLoading(false);
       }
