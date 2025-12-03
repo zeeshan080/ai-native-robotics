@@ -70,8 +70,8 @@ export function SignInForm() {
 
       // Success - get session token from response and redirect
       if (result.data) {
-        // BetterAuth returns the session token directly in the response
-        const sessionToken = result.data.session?.token || result.data.token;
+        // BetterAuth returns the session token directly in result.data.token
+        const sessionToken = result.data.token;
 
         console.log('[SignIn] Result data:', JSON.stringify(result.data, null, 2));
 
