@@ -1,0 +1,38 @@
+# Virtual environments
+.venv/
+venv/
+env/
+__pycache__/
+*.py[cod]
+*$py.class
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Build artifacts
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# Environment files (secrets should be set in Render dashboard)
+.env
+.env.*
+
+# Git
+.git/
+.gitignore
+
+# Documentation (keep README.md for hatchling)
+IMPLEMENTATION.md
+
+# Lock files (we use pyproject.toml)
+uv.lock

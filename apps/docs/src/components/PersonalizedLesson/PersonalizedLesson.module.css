@@ -1,0 +1,148 @@
+.container {
+  margin: 1rem 0;
+}
+
+.tabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  border-bottom: 2px solid var(--ifm-color-emphasis-200);
+  padding-bottom: 0.5rem;
+}
+
+.tab {
+  padding: 0.5rem 1rem;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-weight: 500;
+  color: var(--ifm-color-emphasis-600);
+  border-radius: 4px 4px 0 0;
+  transition: all 0.2s ease;
+}
+
+.tab:hover {
+  color: var(--ifm-color-primary);
+  background: var(--ifm-color-emphasis-100);
+}
+
+.tabActive {
+  color: white;
+  background: var(--ifm-color-primary);
+  border-bottom: 2px solid var(--ifm-color-primary);
+  margin-bottom: -2px;
+}
+
+.tabActive:hover {
+  color: white;
+  background: var(--ifm-color-primary-dark);
+}
+
+.content {
+  min-height: 200px;
+}
+
+.loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem;
+  text-align: center;
+  color: var(--ifm-color-emphasis-600);
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid var(--ifm-color-emphasis-200);
+  border-top-color: var(--ifm-color-primary);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 1rem;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.loadingSubtext {
+  font-size: 0.875rem;
+  color: var(--ifm-color-emphasis-500);
+}
+
+.error {
+  padding: 1rem;
+  background: var(--ifm-color-danger-lightest);
+  border: 1px solid var(--ifm-color-danger-light);
+  border-radius: 4px;
+  color: var(--ifm-color-danger-darkest);
+}
+
+.error p {
+  margin: 0 0 0.5rem 0;
+}
+
+.fallbackContent {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--ifm-color-danger-light);
+}
+
+.personalizedWrapper {
+  position: relative;
+}
+
+.cachedBadge {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background: var(--ifm-color-success-lightest);
+  color: var(--ifm-color-success-darkest);
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.personalizedContent {
+  padding-top: 0.5rem;
+}
+
+.personalizedContent h1,
+.personalizedContent h2,
+.personalizedContent h3 {
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.personalizedContent code {
+  background: var(--ifm-code-background);
+  padding: 0.2em 0.4em;
+  border-radius: 3px;
+  font-size: 0.9em;
+}
+
+.personalizedContent pre {
+  background: var(--ifm-code-background);
+  padding: 1rem;
+  border-radius: 4px;
+  overflow-x: auto;
+}
+
+.personalizedContent pre code {
+  background: none;
+  padding: 0;
+}
+
+.personalizedContent ul {
+  list-style: disc;
+  margin-left: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.personalizedContent li {
+  margin-bottom: 0.25rem;
+}

@@ -1,0 +1,45 @@
+# Turborepo
+.turbo
+
+# Dependencies
+node_modules
+
+# Build outputs
+dist
+build
+.docusaurus
+
+# Environment
+.env.local
+.env
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+
+# Python
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.egg-info
+dist-python
+build-python
+.pytest_cache
+.coverage
+.venv
+venv
+ENV
+
+# ROS
+install/
+log/
+build/
+devel/

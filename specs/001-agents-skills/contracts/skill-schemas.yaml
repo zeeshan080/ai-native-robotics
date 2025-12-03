@@ -1,0 +1,428 @@
+# Skill Input/Output Schemas
+# Feature: 001-agents-skills
+# Date: 2025-11-29
+
+# =============================================================================
+# SHARED SKILLS
+# =============================================================================
+
+read-constitution:
+  input:
+    type: object
+    properties:
+      section_filter:
+        type: string
+        description: Optional filter for specific section (e.g., "III. Strict Technical Stack")
+    required: []
+  output:
+    type: object
+    properties:
+      constitution_text:
+        type: string
+        description: Full or filtered constitution text
+      version:
+        type: string
+        description: Constitution version
+    required: [constitution_text, version]
+
+validate-constitution-compliance:
+  input:
+    type: object
+    properties:
+      content:
+        type: string
+        description: Content to validate
+      content_type:
+        type: string
+        enum: [lesson, plan, urdf, code, translation]
+        description: Type of content being validated
+    required: [content, content_type]
+  output:
+    type: object
+    properties:
+      passed:
+        type: boolean
+      violations:
+        type: array
+        items:
+          type: object
+          properties:
+            rule_name:
+              type: string
+            severity:
+              type: string
+              enum: [error, warning]
+            message:
+              type: string
+            location:
+              type: string
+            suggestion:
+              type: string
+    required: [passed, violations]
+
+determine-layer:
+  input:
+    type: object
+    properties:
+      content_description:
+        type: string
+        description: Description of content to classify
+    required: [content_description]
+  output:
+    type: object
+    properties:
+      layer:
+        type: integer
+        minimum: 1
+        maximum: 5
+        description: Pedagogical layer (1-5)
+      rationale:
+        type: string
+        description: Why this layer was chosen
+    required: [layer, rationale]
+
+# =============================================================================
+# CONTENT SKILLS
+# =============================================================================
+
+generate-lesson-structure:
+  input:
+    type: object
+    properties:
+      lesson_topic:
+        type: string
+      layer:
+        type: integer
+        minimum: 1
+        maximum: 5
+      teaching_pattern:
+        type: string
+        enum: [direct, socratic, error-driven, simulation, ai-assisted]
+    required: [lesson_topic, layer]
+  output:
+    type: object
+    properties:
+      lesson_skeleton:
+        type: string
+        description: Markdown skeleton for lesson
+      sections:
+        type: array
+        items:
+          type: string
+        description: List of section headings
+    required: [lesson_skeleton, sections]
+
+generate-try-with-ai:
+  input:
+    type: object
+    properties:
+      lesson_context:
+        type: string
+        description: Summary of lesson content
+      challenge_topic:
+        type: string
+        description: What the Try With AI section should focus on
+    required: [lesson_context, challenge_topic]
+  output:
+    type: object
+    properties:
+      try_with_ai_section:
+        type: string
+        description: Complete 5-part Try With AI section markdown
+    required: [try_with_ai_section]
+
+assess-cognitive-load:
+  input:
+    type: object
+    properties:
+      lesson_content:
+        type: string
+    required: [lesson_content]
+  output:
+    type: object
+    properties:
+      load_score:
+        type: integer
+        minimum: 1
+        maximum: 10
+        description: Cognitive load score (1=very light, 10=overwhelming)
+      new_concepts_count:
+        type: integer
+      recommendations:
+        type: array
+        items:
+          type: string
+    required: [load_score, new_concepts_count, recommendations]
+
+# =============================================================================
+# ROBOTICS SKILLS
+# =============================================================================
+
+generate-urdf:
+  input:
+    type: object
+    properties:
+      robot_name:
+        type: string
+      links:
+        type: array
+        items:
+          type: object
+          properties:
+            name:
+              type: string
+            geometry:
+              type: string
+              enum: [box, cylinder, sphere, mesh]
+            dimensions:
+              type: object
+            mass:
+              type: number
+      joints:
+        type: array
+        items:
+          type: object
+          properties:
+            name:
+              type: string
+            type:
+              type: string
+              enum: [revolute, prismatic, fixed, continuous]
+            parent:
+              type: string
+            child:
+              type: string
+            limits:
+              type: object
+              properties:
+                lower:
+                  type: number
+                upper:
+                  type: number
+                effort:
+                  type: number
+                velocity:
+                  type: number
+      sensors:
+        type: array
+        items:
+          type: object
+          properties:
+            name:
+              type: string
+            type:
+              type: string
+              enum: [camera, imu, lidar, depth_camera]
+    required: [robot_name, links, joints]
+  output:
+    type: object
+    properties:
+      urdf:
+        type: string
+        description: Complete URDF XML
+      safety_annotations:
+        type: array
+        items:
+          type: string
+        description: Safety comments added to URDF
+    required: [urdf, safety_annotations]
+
+validate-joint-limits:
+  input:
+    type: object
+    properties:
+      content:
+        type: string
+        description: URDF or code containing joint/torque values
+    required: [content]
+  output:
+    type: object
+    properties:
+      valid:
+        type: boolean
+      violations:
+        type: array
+        items:
+          type: object
+          properties:
+            joint_name:
+              type: string
+            issue:
+              type: string
+            current_value:
+              type: number
+            recommended_max:
+              type: number
+    required: [valid, violations]
+
+check-hardware-constraints:
+  input:
+    type: object
+    properties:
+      gpu_required:
+        type: string
+        description: GPU requirement (e.g., "RTX 4070 Ti")
+      ram_required_gb:
+        type: integer
+      cpu_cores_required:
+        type: integer
+      isaac_sim:
+        type: boolean
+        description: Whether Isaac Sim is used
+    required: []
+  output:
+    type: object
+    properties:
+      compatible:
+        type: boolean
+        description: Whether requirements are within constitution limits
+      warnings:
+        type: array
+        items:
+          type: string
+      recommendations:
+        type: array
+        items:
+          type: string
+    required: [compatible, warnings]
+
+# =============================================================================
+# TRANSLATION SKILLS
+# =============================================================================
+
+preserve-technical-terms:
+  input:
+    type: object
+    properties:
+      text:
+        type: string
+    required: [text]
+  output:
+    type: object
+    properties:
+      terms:
+        type: array
+        items:
+          type: string
+        description: Technical terms that should remain in English
+      term_locations:
+        type: array
+        items:
+          type: object
+          properties:
+            term:
+              type: string
+            start:
+              type: integer
+            end:
+              type: integer
+    required: [terms]
+
+translate-to-urdu:
+  input:
+    type: object
+    properties:
+      english_text:
+        type: string
+      preserved_terms:
+        type: array
+        items:
+          type: string
+        description: Terms to keep in English
+    required: [english_text, preserved_terms]
+  output:
+    type: object
+    properties:
+      urdu_text:
+        type: string
+      preserved_terms_in_output:
+        type: array
+        items:
+          type: string
+        description: Confirmation of terms kept in English
+    required: [urdu_text, preserved_terms_in_output]
+
+# =============================================================================
+# PLATFORM SKILLS
+# =============================================================================
+
+validate-tech-stack:
+  input:
+    type: object
+    properties:
+      code:
+        type: string
+      expected_stack:
+        type: object
+        properties:
+          framework:
+            type: string
+          language:
+            type: string
+    required: [code]
+  output:
+    type: object
+    properties:
+      valid:
+        type: boolean
+      violations:
+        type: array
+        items:
+          type: object
+          properties:
+            issue:
+              type: string
+            found:
+              type: string
+            expected:
+              type: string
+            line:
+              type: integer
+    required: [valid, violations]
+
+generate-fastapi-endpoint:
+  input:
+    type: object
+    properties:
+      endpoint_path:
+        type: string
+      method:
+        type: string
+        enum: [GET, POST, PUT, DELETE, PATCH]
+      request_schema:
+        type: object
+      response_schema:
+        type: object
+      description:
+        type: string
+    required: [endpoint_path, method]
+  output:
+    type: object
+    properties:
+      python_code:
+        type: string
+      imports:
+        type: array
+        items:
+          type: string
+    required: [python_code, imports]
+
+generate-docusaurus-config:
+  input:
+    type: object
+    properties:
+      config_type:
+        type: string
+        enum: [sidebar, navbar, docusaurus.config]
+      items:
+        type: array
+        items:
+          type: object
+    required: [config_type, items]
+  output:
+    type: object
+    properties:
+      config_code:
+        type: string
+        description: JavaScript/TypeScript configuration code
+    required: [config_code]

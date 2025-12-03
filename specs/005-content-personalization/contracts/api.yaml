@@ -1,0 +1,381 @@
+openapi: 3.1.0
+info:
+  title: Content Personalization API
+  version: 1.0.0
+  description: API for user management, onboarding, and content personalization
+
+servers:
+  - url: http://localhost:8000/api
+    description: Local development server
+
+paths:
+  /user/create:
+    post:
+      summary: Create a new anonymous user
+      operationId: createUser
+      tags:
+        - User
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateUserRequest'
+      responses:
+        '201':
+          description: User created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '409':
+          description: User with this ID already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /user/{user_id}:
+    get:
+      summary: Get user information
+      operationId: getUser
+      tags:
+        - User
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: User found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /onboarding:
+    post:
+      summary: Submit onboarding questionnaire
+      operationId: submitOnboarding
+      tags:
+        - Onboarding
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OnboardingRequest'
+      responses:
+        '200':
+          description: Onboarding completed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserPreferencesResponse'
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '400':
+          description: Invalid preferences data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /user/preferences:
+    get:
+      summary: Get user preferences
+      operationId: getPreferences
+      tags:
+        - Preferences
+      parameters:
+        - name: X-User-ID
+          in: header
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Preferences found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserPreferencesResponse'
+        '404':
+          description: User or preferences not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    put:
+      summary: Update user preferences
+      operationId: updatePreferences
+      tags:
+        - Preferences
+      parameters:
+        - name: X-User-ID
+          in: header
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdatePreferencesRequest'
+      responses:
+        '200':
+          description: Preferences updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserPreferencesResponse'
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /personalize:
+    post:
+      summary: Generate personalized content for a lesson
+      operationId: personalizeContent
+      tags:
+        - Personalization
+      parameters:
+        - name: X-User-ID
+          in: header
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PersonalizeRequest'
+      responses:
+        '200':
+          description: Personalized content (cached or generated)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PersonalizeResponse'
+        '404':
+          description: User not found or onboarding not completed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Personalization generation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /personalize/cache:
+    delete:
+      summary: Clear personalization cache for user
+      operationId: clearCache
+      tags:
+        - Personalization
+      parameters:
+        - name: X-User-ID
+          in: header
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Cache cleared successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  deleted_count:
+                    type: integer
+                    description: Number of cache entries deleted
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  schemas:
+    CreateUserRequest:
+      type: object
+      required:
+        - user_id
+      properties:
+        user_id:
+          type: string
+          format: uuid
+          description: Client-generated UUID for the user
+
+    UserResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        onboarding_completed:
+          type: boolean
+
+    OnboardingRequest:
+      type: object
+      required:
+        - user_id
+        - education_level
+        - programming_experience
+        - robotics_background
+        - ai_ml_experience
+        - learning_goals
+        - preferred_language
+      properties:
+        user_id:
+          type: string
+          format: uuid
+        education_level:
+          type: string
+          enum: [high_school, undergraduate, graduate, professional]
+        programming_experience:
+          type: string
+          enum: [none, beginner, intermediate, advanced]
+        robotics_background:
+          type: boolean
+        ai_ml_experience:
+          type: string
+          enum: [none, basic, intermediate, advanced]
+        learning_goals:
+          type: array
+          items:
+            type: string
+            enum: [career_change, research, hobby, teaching, building_projects]
+          minItems: 1
+        preferred_language:
+          type: string
+          enum: [en, ur]
+          default: en
+
+    UpdatePreferencesRequest:
+      type: object
+      properties:
+        education_level:
+          type: string
+          enum: [high_school, undergraduate, graduate, professional]
+        programming_experience:
+          type: string
+          enum: [none, beginner, intermediate, advanced]
+        robotics_background:
+          type: boolean
+        ai_ml_experience:
+          type: string
+          enum: [none, basic, intermediate, advanced]
+        learning_goals:
+          type: array
+          items:
+            type: string
+            enum: [career_change, research, hobby, teaching, building_projects]
+        preferred_language:
+          type: string
+          enum: [en, ur]
+
+    UserPreferencesResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        user_id:
+          type: string
+          format: uuid
+        education_level:
+          type: string
+        programming_experience:
+          type: string
+        robotics_background:
+          type: boolean
+        ai_ml_experience:
+          type: string
+        learning_goals:
+          type: array
+          items:
+            type: string
+        preferred_language:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    PersonalizeRequest:
+      type: object
+      required:
+        - lesson_slug
+        - original_content
+      properties:
+        lesson_slug:
+          type: string
+          description: Lesson identifier (e.g., "01-intro/embodiment")
+          example: "01-what-is-physical-ai/embodiment-hypothesis"
+        original_content:
+          type: string
+          description: Original lesson content in Markdown format
+
+    PersonalizeResponse:
+      type: object
+      properties:
+        personalized_content:
+          type: string
+          description: Personalized lesson content in Markdown format
+        cached:
+          type: boolean
+          description: Whether the content was served from cache
+        generated_at:
+          type: string
+          format: date-time
+          description: When the personalized content was generated
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Error type
+        message:
+          type: string
+          description: Human-readable error message
+        detail:
+          type: object
+          description: Additional error details

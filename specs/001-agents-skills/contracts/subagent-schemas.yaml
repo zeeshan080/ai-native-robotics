@@ -1,0 +1,427 @@
+# Subagent Input/Output Schemas
+# Feature: 001-agents-skills
+# Date: 2025-11-29
+
+# =============================================================================
+# CONTENT SUBAGENTS
+# =============================================================================
+
+super-orchestra:
+  description: High-level planner producing spec.md and chapter index
+  input:
+    type: object
+    properties:
+      course_description:
+        type: string
+        description: Full course description and objectives
+      weekly_breakdown:
+        type: array
+        items:
+          type: object
+          properties:
+            week:
+              type: integer
+            topic:
+              type: string
+            objectives:
+              type: array
+              items:
+                type: string
+      constitution_summary:
+        type: string
+    required: [course_description, weekly_breakdown]
+  output:
+    type: object
+    properties:
+      spec_md:
+        type: string
+        description: Generated spec.md content
+      chapter_index:
+        type: array
+        items:
+          type: object
+          properties:
+            chapter_number:
+              type: integer
+            title:
+              type: string
+            target_layer:
+              type: integer
+              minimum: 1
+              maximum: 5
+            difficulty_tier:
+              type: string
+              enum: [beginner, intermediate, advanced]
+            learning_objectives:
+              type: array
+              items:
+                type: string
+    required: [spec_md, chapter_index]
+
+chapter-planner:
+  description: Produces plan.md with lesson list and layer assignments
+  input:
+    type: object
+    properties:
+      chapter_topic:
+        type: string
+      target_layer:
+        type: integer
+        minimum: 1
+        maximum: 5
+      prerequisites:
+        type: array
+        items:
+          type: string
+      constitution_summary:
+        type: string
+    required: [chapter_topic, target_layer]
+  output:
+    type: object
+    properties:
+      plan_md:
+        type: string
+        description: Complete plan.md content
+      lessons:
+        type: array
+        items:
+          type: object
+          properties:
+            lesson_number:
+              type: integer
+            title:
+              type: string
+            layer_assignment:
+              type: integer
+              minimum: 1
+              maximum: 5
+            teaching_pattern:
+              type: string
+              enum: [direct, socratic, error-driven, simulation, ai-assisted]
+            estimated_duration_minutes:
+              type: integer
+    required: [plan_md, lessons]
+
+lesson-writer:
+  description: Creates lesson markdown with Try With AI section
+  input:
+    type: object
+    properties:
+      plan_md:
+        type: string
+      lesson_topic:
+        type: string
+      layer:
+        type: integer
+        minimum: 1
+        maximum: 5
+      teaching_pattern:
+        type: string
+      constitution_summary:
+        type: string
+    required: [plan_md, lesson_topic, layer]
+  output:
+    type: object
+    properties:
+      lesson_md:
+        type: string
+        description: Complete lesson markdown
+      code_blocks:
+        type: array
+        items:
+          type: object
+          properties:
+            language:
+              type: string
+            code:
+              type: string
+            runnable:
+              type: boolean
+      try_with_ai_included:
+        type: boolean
+        description: Confirmation that Try With AI is final section
+    required: [lesson_md, try_with_ai_included]
+
+safety-reviewer:
+  description: Analyzes content for robotics safety issues
+  input:
+    type: object
+    properties:
+      content_to_review:
+        type: string
+      content_type:
+        type: string
+        enum: [lesson, code, urdf, launch_file]
+      constitution_summary:
+        type: string
+    required: [content_to_review, content_type]
+  output:
+    type: object
+    properties:
+      safety_report:
+        type: string
+        description: Markdown safety report
+      issues:
+        type: array
+        items:
+          type: object
+          properties:
+            severity:
+              type: string
+              enum: [critical, warning, info]
+            category:
+              type: string
+              enum: [torque, speed, latency, environment, llm_safety]
+            description:
+              type: string
+            location:
+              type: string
+            remediation:
+              type: string
+      passed:
+        type: boolean
+    required: [safety_report, issues, passed]
+
+pedagogy-reviewer:
+  description: Validates cognitive load and layer progression
+  input:
+    type: object
+    properties:
+      chapter_content:
+        type: string
+      expected_layer:
+        type: integer
+        minimum: 1
+        maximum: 5
+      constitution_summary:
+        type: string
+    required: [chapter_content]
+  output:
+    type: object
+    properties:
+      pedagogy_report:
+        type: string
+      cognitive_load_score:
+        type: integer
+        minimum: 1
+        maximum: 10
+      layer_compliance:
+        type: boolean
+      recommendations:
+        type: array
+        items:
+          type: string
+    required: [pedagogy_report, cognitive_load_score, layer_compliance]
+
+translator-urdu:
+  description: Translates English content to Urdu preserving technical terms
+  input:
+    type: object
+    properties:
+      english_content:
+        type: string
+      content_type:
+        type: string
+        enum: [lesson, exercise, explanation]
+      constitution_summary:
+        type: string
+    required: [english_content]
+  output:
+    type: object
+    properties:
+      urdu_content:
+        type: string
+      preserved_terms:
+        type: array
+        items:
+          type: string
+        description: Technical terms kept in English
+      translation_notes:
+        type: array
+        items:
+          type: string
+        description: Notes about translation choices
+    required: [urdu_content, preserved_terms]
+
+rag-answerability:
+  description: Analyzes content for RAG retrieval optimization
+  input:
+    type: object
+    properties:
+      content_to_review:
+        type: string
+      constitution_summary:
+        type: string
+    required: [content_to_review]
+  output:
+    type: object
+    properties:
+      suggestions_report:
+        type: string
+      heading_improvements:
+        type: array
+        items:
+          type: object
+          properties:
+            current:
+              type: string
+            suggested:
+              type: string
+            rationale:
+              type: string
+      missing_definitions:
+        type: array
+        items:
+          type: object
+          properties:
+            term:
+              type: string
+            suggested_location:
+              type: string
+    required: [suggestions_report]
+
+# =============================================================================
+# SOFTWARE SUBAGENTS
+# =============================================================================
+
+monorepo-architect:
+  description: Validates and enforces repository layout
+  input:
+    type: object
+    properties:
+      project_requirements:
+        type: string
+      current_structure:
+        type: string
+        description: Output of tree command or similar
+      constitution_summary:
+        type: string
+    required: [project_requirements]
+  output:
+    type: object
+    properties:
+      directory_structure:
+        type: string
+        description: Proposed directory tree
+      changes_needed:
+        type: array
+        items:
+          type: object
+          properties:
+            action:
+              type: string
+              enum: [create, move, delete]
+            path:
+              type: string
+            reason:
+              type: string
+    required: [directory_structure]
+
+rag-backend-engineer:
+  description: Produces FastAPI endpoints for RAG system
+  input:
+    type: object
+    properties:
+      endpoint_requirements:
+        type: string
+      existing_code:
+        type: string
+        description: Current backend code for context
+      constitution_summary:
+        type: string
+    required: [endpoint_requirements]
+  output:
+    type: object
+    properties:
+      code_files:
+        type: array
+        items:
+          type: object
+          properties:
+            path:
+              type: string
+            content:
+              type: string
+            action:
+              type: string
+              enum: [create, update]
+      dependencies:
+        type: array
+        items:
+          type: string
+        description: Python packages to add to requirements.txt
+    required: [code_files]
+
+robotics-code-specialist:
+  description: Produces ROS 2 packages, URDF, and launch scripts
+  input:
+    type: object
+    properties:
+      robotics_requirements:
+        type: string
+      robot_description:
+        type: object
+        description: Optional detailed robot specification
+      constitution_summary:
+        type: string
+    required: [robotics_requirements]
+  output:
+    type: object
+    properties:
+      files:
+        type: array
+        items:
+          type: object
+          properties:
+            path:
+              type: string
+            content:
+              type: string
+            file_type:
+              type: string
+              enum: [urdf, xacro, python, launch, yaml]
+      package_structure:
+        type: string
+        description: ROS 2 package directory structure
+      safety_annotations:
+        type: array
+        items:
+          type: string
+    required: [files]
+
+gpu-constraints-checker:
+  description: Validates hardware requirements against constitution
+  input:
+    type: object
+    properties:
+      hardware_requirements:
+        type: object
+        properties:
+          gpu:
+            type: string
+          ram_gb:
+            type: integer
+          uses_isaac_sim:
+            type: boolean
+      target_environment:
+        type: string
+        enum: [workstation, jetson, cloud]
+      constitution_summary:
+        type: string
+    required: [hardware_requirements]
+  output:
+    type: object
+    properties:
+      constraints_report:
+        type: string
+      compatible:
+        type: boolean
+      warnings:
+        type: array
+        items:
+          type: string
+      alternative_suggestions:
+        type: array
+        items:
+          type: string
+    required: [constraints_report, compatible]

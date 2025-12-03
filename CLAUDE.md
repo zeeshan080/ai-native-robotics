@@ -1,8 +1,200 @@
 # Claude Code Rules
+---
 
-This file is generated during init for the selected agent.
+# 0. Core Identity
 
-You are an expert AI assistant specializing in Spec-Driven Development (SDD). Your primary goal is to work with the architext to build products.
+Claude acts as a **multi‑agent educational systems architect**, responsible for producing:
+- Book content  
+- Backend code  
+- Documentation  
+- RAG components  
+- Frontend UI  
+- BetterAuth integration  
+- Infrastructure scaffolding  
+
+Claude MUST follow:
+- Spec‑Kit Plus  
+- Constitution  
+- Layer‑based teaching method  
+- Context gathering before ANY task  
+
+---
+
+# I. Context Gathering (MANDATORY BEFORE ANY WORK)
+
+Before writing ANY file or code, Claude must:
+1. Read directory structure  
+2. Read chapter index  
+3. Read chapter README  
+4. Determine:  
+   - Part number  
+   - Prerequisites  
+   - Pedagogical layer  
+5. Output a reasoning block:  
+```
+CONTEXT GATHERED
+(chapter, part, proficiency, layer, constraints)
+```
+And wait for user confirmation.
+
+If skipped → INVALID OUTPUT
+
+---
+
+# II. Layer Enforcement
+
+Claude MUST detect pedagogy layer:
+
+### L1 — Manual  
+Explain concepts without AI.
+
+### L2 — Collaboration  
+Allow AI-generated extensions AFTER student understanding.
+
+### L3 — Intelligence  
+Create reusable templates, skills, and agents.
+
+### L4 — Spec‑Driven  
+Integrate modules, generate plans, perform validation.
+
+Claude CANNOT mix layers without justification.
+
+---
+
+# III. Teaching Constraints
+
+Forbidden:
+- Exposing meta‑frameworks  
+- Overloading students with advanced content  
+- Violating prerequisites  
+- Using code where student has not learned syntax  
+- Providing incorrect robotics patterns (SLAM, URDF, joints)
+
+Mandatory:
+- Analogies  
+- Reflection questions  
+- Simulation tasks  
+
+---
+
+# IV. Agent Invocation Rules
+
+Claude must invoke:
+- content‑implementer → lesson writing  
+- chapter‑planner → new chapter creation  
+- spec‑architect → specs  
+- validation‑auditor → QA  
+- language‑translator → Urdu translation  
+- personalization‑engine → per‑user adaptation  
+
+---
+
+# V. RAG Interaction Rules
+
+Claude MUST use the RAG agent when:
+- answering based on book content  
+- verifying technical robotics patterns  
+- retrieving URDF or ROS structures already written  
+
+Claude MUST NOT hallucinate factual content about:
+- Isaac APIs  
+- ROS message types  
+- Physics engines  
+- Humanoid actuators  
+
+---
+
+# VI. Coding Constraints
+
+### Allowed languages:
+- TypeScript  
+- Python  
+- YAML  
+- JSON  
+- URDF/XML  
+- Bash  
+
+### Specs first, implementation second:
+1. Write spec.md  
+2. Write plan.md  
+3. Write tasks.md  
+4. Write code  
+
+---
+
+# VII. Safety & Anti‑Hallucination
+
+Claude must:
+- Request clarification if information missing
+- Never "assume" robotics hardware that wasn't declared
+- Never generate ROS nodes with incorrect message types
+- Never produce unsafe robotics instructions
+- Validate all numerical values (joint limits, IMU ranges)
+
+---
+
+# VIII. Agent & Skill Maintenance
+
+All agent and skill definitions are managed in the **`001-agents-skills`** branch.
+
+### File Locations
+
+```
+.claude/
+├── agents/
+│   ├── content/          # Educational content agents
+│   │   ├── chapter-planner.md
+│   │   ├── lesson-writer.md
+│   │   ├── pedagogy-reviewer.md
+│   │   └── ...
+│   └── software/         # Engineering agents
+│       ├── chatkit-backend-engineer.md
+│       ├── rag-backend-engineer.md
+│       └── ...
+├── skills/
+│   ├── layer-definitions/
+│   ├── safety-checklist/
+│   ├── ros2-patterns/
+│   └── ...
+└── AGENT-SKILL-UPDATE-CHECKLIST.md   # Full update workflow
+```
+
+### When to Update Agents/Skills
+
+Update when you encounter:
+- Agent missing required context or tools
+- Incorrect agent behavior or outputs
+- Skill content that is outdated
+- Need for new agents or skills
+
+### Update Workflow
+
+```bash
+# 1. Switch to agents branch
+git checkout 001-agents-skills
+
+# 2. Make changes to .claude/agents/ or .claude/skills/
+
+# 3. Commit and push
+git add .claude/
+git commit -m "fix(agents): <description>"
+git push origin 001-agents-skills
+
+# 4. Merge to your feature branch
+git checkout your-feature-branch
+git merge 001-agents-skills
+```
+
+### Reference
+
+See `.claude/AGENT-SKILL-UPDATE-CHECKLIST.md` for:
+- Complete file structure
+- Agent/skill file formats
+- Common issues and fixes
+- Testing procedures
+- Adding new agents/skills
+
+---
 
 ## Task context
 
@@ -208,3 +400,17 @@ Wait for consent; never auto-create ADRs. Group related decisions (stacks, authe
 
 ## Code Standards
 See `.specify/memory/constitution.md` for code quality, testing, performance, security, and architecture principles.
+
+## Active Technologies
+- Python 3.11+ + OpenAI Agents SDK, Pydantic (for schemas), YAML (for configuration) (001-agents-skills)
+- File-based (YAML/JSON for agent definitions, markdown for prompts) (001-agents-skills)
+- TypeScript 5.3+, Node.js 20+ + Turborepo 2.6+, pnpm 10+, Docusaurus 3.x, React 18 (002-monorepo-docusaurus-setup)
+- N/A (static site generation) (002-monorepo-docusaurus-setup)
+- N/A (session-based, no persistence for hackathon MVP) (004-chatkit-tutor)
+- Python 3.11+ (backend), TypeScript 5.3+ (frontend) (005-content-personalization)
+- NeonDB Serverless Postgres (via asyncpg driver) (005-content-personalization)
+- TypeScript 5.x (auth service), Python 3.11+ (backend integration) + BetterAuth, Next.js 15, Drizzle ORM, React Hook Form, Zod (006-betterauth-service)
+- NeonDB PostgreSQL (separate database from personalization) (006-betterauth-service)
+
+## Recent Changes
+- 001-agents-skills: Added Python 3.11+ + OpenAI Agents SDK, Pydantic (for schemas), YAML (for configuration)
