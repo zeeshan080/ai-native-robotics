@@ -13,12 +13,35 @@ const getAuthUrl = () => {
 };
 
 const AUTH_URL = getAuthUrl();
+const SESSION_TOKEN_KEY = 'better_auth_session_token';
 
-// Create auth client directly to avoid server-side dependencies from @repo/auth-config
+// Helper to get token from localStorage
+const getStoredToken = (): string | null => {
+  if (typeof window === 'undefined') return null;
+  return localStorage.getItem(SESSION_TOKEN_KEY);
+};
+
+// Helper to store token in localStorage
+const storeToken = (token: string): void => {
+  if (typeof window === 'undefined') return;
+  localStorage.setItem(SESSION_TOKEN_KEY, token);
+};
+
+// Helper to remove token from localStorage
+const removeToken = (): void => {
+  if (typeof window === 'undefined') return;
+  localStorage.removeItem(SESSION_TOKEN_KEY);
+};
+
+// Create auth client with bearer token authentication for cross-domain
 const authClient = createAuthClient({
   baseURL: AUTH_URL,
   fetchOptions: {
     credentials: 'include',
+    auth: {
+      type: 'Bearer',
+      token: () => getStoredToken() || '',
+    },
   },
 });
 
@@ -45,11 +68,36 @@ export function NavbarAuthButton(): React.ReactElement {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    async function fetchSession() {
+    async function initAuth() {
       try {
+        // Check for session token in URL (from redirect after login)
+        if (typeof window !== 'undefined') {
+          const urlParams = new URLSearchParams(window.location.search);
+          const tokenFromUrl = urlParams.get('session_token');
+
+          if (tokenFromUrl) {
+            console.log('[NavbarAuth] Found session token in URL, storing...');
+            storeToken(tokenFromUrl);
+
+            // Clean URL by removing token parameter
+            urlParams.delete('session_token');
+            const cleanUrl = `${window.location.pathname}${urlParams.toString() ? '?' + urlParams.toString() : ''}`;
+            window.history.replaceState({}, '', cleanUrl);
+          }
+        }
+
+        // Fetch session using stored token
+        const token = getStoredToken();
+        if (!token) {
+          console.log('[NavbarAuth] No token found, user not authenticated');
+          setIsLoading(false);
+          return;
+        }
+
         console.log('[NavbarAuth] Fetching session from:', AUTH_URL);
         const session = await authClient.getSession();
         console.log('[NavbarAuth] Session response:', session);
+
         if (session.data?.user) {
           console.log('[NavbarAuth] User authenticated:', session.data.user.email);
           setUser({
@@ -58,15 +106,17 @@ export function NavbarAuthButton(): React.ReactElement {
             name: session.data.user.name || '',
           });
         } else {
-          console.log('[NavbarAuth] No user in session, error:', session.error);
+          console.log('[NavbarAuth] Invalid session, clearing token');
+          removeToken();
         }
       } catch (error) {
         console.error('[NavbarAuth] Failed to fetch session:', error);
+        removeToken();
       } finally {
         setIsLoading(false);
       }
     }
-    fetchSession();
+    initAuth();
   }, []);
 
   const handleLogin = () => {
@@ -76,10 +126,19 @@ export function NavbarAuthButton(): React.ReactElement {
 
   const handleLogout = async () => {
     try {
+      // Clear local token
+      removeToken();
+
+      // Call signOut on server (optional, but recommended)
       await authClient.signOut();
+
+      // Reload page to reset UI
       window.location.reload();
     } catch (error) {
       console.error('Logout error:', error);
+      // Still clear token even if server call fails
+      removeToken();
+      window.location.reload();
     }
   };
 
